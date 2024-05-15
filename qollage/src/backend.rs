@@ -65,7 +65,7 @@ pub fn save_circuit(
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
     let mut buffer = Cursor::new(Vec::new());
     image
-        .write_to(&mut buffer, image::ImageOutputFormat::Png)
+        .write_to(&mut buffer, image::ImageFormat::Png)
         .map_err(|x| {
             PyValueError::new_err(format!(
                 "Error during the generation of the Png file: {x:?}"
@@ -137,7 +137,7 @@ pub fn draw_circuit(
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
     let mut buffer = Cursor::new(Vec::new());
     image
-        .write_to(&mut buffer, image::ImageOutputFormat::Png)
+        .write_to(&mut buffer, image::ImageFormat::Png)
         .map_err(|x| {
             PyValueError::new_err(format!(
                 "Error during the generation of the Png file: {x:?}"

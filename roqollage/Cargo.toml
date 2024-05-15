@@ -25,7 +25,7 @@ typst = { git = "https://github.com/typst/typst", rev = "v0.11.0" }
 typst-render = { git = "https://github.com/typst/typst", rev = "v0.11.0" }
 comemo = "0.4"
 image = "0.24"
-ttf-parser = "0.20"
+ttf-parser = "0.21"
 time = "0.3"
 bytemuck = "1"
 ndarray = "0.15"

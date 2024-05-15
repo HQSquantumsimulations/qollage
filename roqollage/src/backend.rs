@@ -94,13 +94,13 @@ impl TypstBackend {
             }
         };
         let buffer = Bytes::from(bytes);
-        let fonts = Font::new(buffer.clone(), 0).map_or_else(|| vec![], |font| vec![font]);
+        let fonts = Font::new(buffer.clone(), 0).map_or_else(std::vec::Vec::new, |font| vec![font]);
         Ok(Self {
             library: Prehashed::new(Library::default()),
             book: Prehashed::new(FontBook::from_fonts(&fonts)),
             source: Source::detached(typst_str.clone()),
             files: RefCell::new(HashMap::new()),
-            fonts: fonts,
+            fonts,
             time: time::OffsetDateTime::now_utc(),
             dependencies: PathBuf::from_str(".qollage/cache").map_err(|_| {
                 RoqoqoBackendError::RoqoqoError(roqoqo::RoqoqoError::GenericError {
@@ -117,7 +117,7 @@ impl TypstBackend {
     /// * `path` `The path where to save the downloaded font file
     fn download_font(path: PathBuf) -> Result<Vec<u8>, RoqoqoBackendError> {
         std::fs::create_dir_all(
-            &path
+            path
                 .parent()
                 .unwrap_or(PathBuf::from(".qollage/fonts/").as_path()),
         )
@@ -227,7 +227,7 @@ impl typst::World for TypstBackend {
             let bytes = self.file(id)?;
             let contents = std::str::from_utf8(&bytes).map_err(|_| FileError::InvalidUtf8)?;
             let contents = contents.trim_start_matches('\u{feff}');
-            return Ok(Source::new(id, contents.into()));
+            Ok(Source::new(id, contents.into()))
         }
     }
 
@@ -322,13 +322,10 @@ impl FromStr for RenderPragmas {
             "none" => Ok(RenderPragmas::None),
             "all" => Ok(RenderPragmas::All),
             _ => Ok(RenderPragmas::Partial(
-                s.split(",")
-                    .filter_map(|gate_name| {
-                        gate_name
+                s.split(',')
+                    .filter(|&gate_name| gate_name
                             .trim()
-                            .starts_with("Pragma")
-                            .then(|| gate_name.trim().to_owned())
-                    })
+                            .starts_with("Pragma")).map(|gate_name| gate_name.trim().to_owned())
                     .collect(),
             )),
         }
@@ -396,20 +393,20 @@ pub fn circuit_into_typst_str(
     flatten_multiple_vec(
         &mut circuit_gates,
         &mut bosonic_gates,
-        &(0..n_qubits).collect::<Vec<usize>>().as_slice(),
-        &(0..n_bosons).collect::<Vec<usize>>().as_slice(),
+        (0..n_qubits).collect::<Vec<usize>>().as_slice(),
+        (0..n_bosons).collect::<Vec<usize>>().as_slice(),
     );
     flatten_multiple_vec(
         &mut circuit_gates,
         &mut classical_gates,
-        &(0..n_qubits).collect::<Vec<usize>>().as_slice(),
-        &(0..n_classical).collect::<Vec<usize>>().as_slice(),
+        (0..n_qubits).collect::<Vec<usize>>().as_slice(),
+        (0..n_classical).collect::<Vec<usize>>().as_slice(),
     );
     flatten_multiple_vec(
         &mut bosonic_gates,
         &mut classical_gates,
-        &(0..n_bosons).collect::<Vec<usize>>().as_slice(),
-        &(0..n_classical).collect::<Vec<usize>>().as_slice(),
+        (0..n_bosons).collect::<Vec<usize>>().as_slice(),
+        (0..n_classical).collect::<Vec<usize>>().as_slice(),
     );
     let mut is_first = true;
     for (n_qubit, gates) in circuit_gates.iter().enumerate() {
@@ -454,8 +451,8 @@ pub fn circuit_into_typst_str(
     }
     typst_str = typst_str
         .strip_suffix(" [\\ ],\n")
-        .unwrap_or(&typst_str)
-        .to_owned();
+        .map(str::to_owned)
+        .unwrap_or(typst_str);
     typst_str.push_str(")\n}\n");
     Ok(typst_str)
 }

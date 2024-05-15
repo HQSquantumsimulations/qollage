@@ -58,9 +58,9 @@ fn test_bell() {
     Python::with_gil(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
 
-        let _ = save_circuit(&circuitpy, None, 3.5, "PragmaOverrotation", None).unwrap();
+        save_circuit(&circuitpy, None, 3.5, "PragmaOverrotation", None).unwrap();
     });
     let read_in_path = Path::new("circuit.png");
     assert!(read_in_path.exists());
-    fs::remove_file(&read_in_path).unwrap();
+    fs::remove_file(read_in_path).unwrap();
 }

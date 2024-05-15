@@ -42,7 +42,7 @@ fn add_qubits_vec(circuit_gates: &mut Vec<Vec<String>>, qubits: &[usize]) {
 /// # Returns
 ///
 /// * `usize` - The total length the gates will take on the image.
-fn effective_len(gates: &Vec<String>) -> usize {
+fn effective_len(gates: &[String]) -> usize {
     gates.len()
         - gates
             .iter()
@@ -70,7 +70,7 @@ fn effective_len(gates: &Vec<String>) -> usize {
 /// flatten_qubits(&mut circuit_gates, vec![0, 2]);
 ///
 /// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
-fn flatten_qubits(circuit_gates: &mut Vec<Vec<String>>, qubits: &[usize]) {
+fn flatten_qubits(circuit_gates: &mut [Vec<String>], qubits: &[usize]) {
     let max_len = qubits
         .iter()
         .map(|&qubit| effective_len(&circuit_gates[qubit]))
@@ -86,6 +86,26 @@ fn flatten_qubits(circuit_gates: &mut Vec<Vec<String>>, qubits: &[usize]) {
                 circuit_gates[qubit].push("1".to_owned());
             }
         }
+    }
+}
+
+/// Pushes ones in the gates with index between min and max.
+///
+/// # Arguments
+///
+/// * `circuit_gates` - A vector of all the gates vectors of the circuit.
+/// * `min` - The minimum index of the circuit
+/// * `max` - The maximum index of the circuit
+///
+/// # Example:
+/// ````
+/// let circuit_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
+/// flatten_qubits(&mut circuit_gates, vec![0, 2]);
+///
+/// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
+fn push_ones(circuit_gates: &mut [Vec<String>], min: usize, max: usize) {
+    for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+        gates.push("1".to_owned());
     }
 }
 
@@ -108,8 +128,8 @@ fn flatten_qubits(circuit_gates: &mut Vec<Vec<String>>, qubits: &[usize]) {
 /// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
 /// assert_eq!(bosonic_gates, vec![vec!["$H$", "1"], vec!["$H$", "1"], vec![]]);
 pub(crate) fn flatten_multiple_vec(
-    gate_vec_1: &mut Vec<Vec<String>>,
-    gate_vec_2: &mut Vec<Vec<String>>,
+    gate_vec_1: &mut [Vec<String>],
+    gate_vec_2: &mut [Vec<String>],
     vec_1_ind: &[usize],
     vec_2_ind: &[usize],
 ) {
@@ -157,7 +177,7 @@ pub(crate) fn flatten_multiple_vec(
 ///
 /// * `String` The formatted string.
 fn format_symbol_str(str_value: &str) -> String {
-    let (main_variant, sup) = str_value.split_once(".").unwrap_or((str_value, ""));
+    let (main_variant, sup) = str_value.split_once('.').unwrap_or((str_value, ""));
     let all_symbols = typst::symbols::sym();
     let symbol = all_symbols.scope().get(main_variant);
     match symbol {
@@ -272,7 +292,7 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
         .last();
     if effective_len(&circuit_gates[0]).eq(&circuit_gates
         .iter()
-        .map(|gates| effective_len(&gates))
+        .map(|gates: &Vec<String>| effective_len(gates.as_slice()))
         .max()
         .unwrap_or(0))
         && last_slice.is_some()
@@ -284,7 +304,7 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
                 .unwrap();
         for _ in 0..last_slice
             .unwrap()
-            .split("\n")
+            .split('\n')
             .last()
             .unwrap_or(".")
             .chars()
@@ -295,7 +315,7 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
             circuit_gates[0].push("1".to_owned());
         }
     }
-    if circuit_gates[0].len() == 0 {
+    if circuit_gates[0].is_empty() {
         circuit_gates[0].push("1".to_owned());
         for qubit in 1..10 {
             circuit_lock.push((qubit, 0))
@@ -551,7 +571,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PragmaOverrotation(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -569,9 +589,7 @@ pub fn add_gate(
                 qubits.len(),
                 op.qubits().iter().map(|qubit| format!("(qubit: {})", format_qubit_input(qubit - min, "x"))).collect::<Vec<String>>().join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::PragmaBoostNoise(op) => {
@@ -585,7 +603,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PragmaStopParallelBlock(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -601,13 +619,11 @@ pub fn add_gate(
                 qubits.len(),
                 op.qubits().iter().map(|qubit| format!("(qubit: {})", format_qubit_input(qubit - min, "x"))).collect::<Vec<String>>().join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::PragmaStartDecompositionBlock(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -623,13 +639,11 @@ pub fn add_gate(
                 qubits.len(),
                 op.qubits().iter().map(|qubit| format!("(qubit: {})", format_qubit_input(qubit - min, "x"))).collect::<Vec<String>>().join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::PragmaStopDecompositionBlock(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -644,9 +658,7 @@ pub fn add_gate(
                 qubits.len(),
                 op.qubits().iter().map(|qubit| format!("(qubit: {})", format_qubit_input(qubit - min, "x"))).collect::<Vec<String>>().join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::PragmaGlobalPhase(op) => {
@@ -660,7 +672,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PragmaSleep(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -680,9 +692,7 @@ pub fn add_gate(
                     .collect::<Vec<String>>()
                     .join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::PragmaActiveReset(op) => {
@@ -737,7 +747,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PragmaConditional(op) => {
-            if op.circuit().len() == 0 {
+            if op.circuit().is_empty() {
                 return Ok(());
             }
             prepare_for_slice(circuit_gates, circuit_lock);
@@ -762,7 +772,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap_or(&0_usize).to_owned();
             let max = used_qubits.iter().max().unwrap_or(&0_usize).to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if qubits.len() == 0 {
+            if qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -874,9 +884,7 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::ControlledPhaseShift(op) => {
@@ -901,7 +909,7 @@ pub fn add_gate(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
             ));
-            circuit_gates[*op.target()].push(format!("gate($ \"Y\" $)",));
+            circuit_gates[*op.target()].push("gate($ \"Y\" $)".to_string());
             Ok(())
         }
         Operation::ControlledPauliZ(op) => {
@@ -912,7 +920,7 @@ pub fn add_gate(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
             ));
-            circuit_gates[*op.target()].push(format!("gate($ \"Z\" $)",));
+            circuit_gates[*op.target()].push("gate($ \"Z\" $)".to_string());
             Ok(())
         }
         Operation::MolmerSorensenXX(op) => {
@@ -927,9 +935,7 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "ctrl"),
                 format_qubit_input(*op.target() - min, "targ")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::VariableMSXX(op) => {
@@ -945,9 +951,7 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::GivensRotation(op) => {
@@ -964,9 +968,7 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "ctrl"),
                 format_qubit_input(*op.target() - min, "targ")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::GivensRotationLittleEndian(op) => {
@@ -983,9 +985,7 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "ctrl"),
                 format_qubit_input(*op.target() - min, "targ")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::Qsim(op) => {
@@ -1003,8 +1003,8 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1023,8 +1023,8 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1043,8 +1043,8 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1062,8 +1062,8 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1080,9 +1080,7 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
-            }
+            push_ones(circuit_gates, min, max);
             Ok(())
         }
         Operation::ComplexPMInteraction(op) => {
@@ -1099,8 +1097,8 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "x"),
                 format_qubit_input(*op.target() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1117,13 +1115,13 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "ctrl"),
                 format_qubit_input(*op.target() - min, "targ")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
         Operation::MultiQubitMS(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1143,13 +1141,13 @@ pub fn add_gate(
                     .collect::<Vec<String>>()
                     .join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
         Operation::MultiQubitZZ(op) => {
-            if op.qubits().len() == 0 {
+            if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1169,8 +1167,8 @@ pub fn add_gate(
                     .collect::<Vec<String>>()
                     .join(",")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1262,7 +1260,6 @@ pub fn add_gate(
             prepare_for_slice(circuit_gates, circuit_lock);
             let circuit = op.circuit().clone().unwrap_or(
                 (0..circuit_gates.len())
-                    .into_iter()
                     .map(|qubit| Operation::from(Identity::new(qubit)))
                     .collect(),
             );
@@ -1284,7 +1281,7 @@ pub fn add_gate(
                 }
                 InvolvedQubits::None => {}
             }
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1292,7 +1289,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if circuit.len() == 0 || qubits.len() == 0 {
+            if circuit.is_empty() || qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1331,7 +1328,6 @@ pub fn add_gate(
             prepare_for_slice(circuit_gates, circuit_lock);
             let circuit = op.circuit().clone().unwrap_or(
                 (0..circuit_gates.len())
-                    .into_iter()
                     .map(|qubit| Operation::from(Identity::new(qubit)))
                     .collect(),
             );
@@ -1353,7 +1349,7 @@ pub fn add_gate(
                 }
                 InvolvedQubits::None => {}
             }
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1361,7 +1357,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if circuit.len() == 0 || qubits.len() == 0 {
+            if circuit.is_empty() || qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1400,7 +1396,6 @@ pub fn add_gate(
             prepare_for_slice(circuit_gates, circuit_lock);
             let circuit = op.circuit().clone().unwrap_or(
                 (0..circuit_gates.len())
-                    .into_iter()
                     .map(|qubit| Operation::from(Identity::new(qubit)))
                     .collect(),
             );
@@ -1422,7 +1417,7 @@ pub fn add_gate(
                 }
                 InvolvedQubits::None => {}
             }
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1430,7 +1425,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if circuit.len() == 0 || qubits.len() == 0 {
+            if circuit.is_empty() || qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1476,7 +1471,7 @@ pub fn add_gate(
                     3 => circuit.add_operation(PauliZ::new(qubit)),
                     _ => {
                         return Err(RoqoqoBackendError::RoqoqoError(
-                            RoqoqoError::QubitMappingError { qubit: qubit },
+                            RoqoqoError::QubitMappingError { qubit },
                         ))
                     }
                 }
@@ -1499,7 +1494,7 @@ pub fn add_gate(
                 }
                 InvolvedQubits::None => {}
             }
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1507,7 +1502,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if circuit.len() == 0 || qubits.len() == 0 {
+            if circuit.is_empty() || qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1550,7 +1545,7 @@ pub fn add_gate(
                 .map_or((0..circuit_gates.len()).collect(), |map| {
                     map.keys().cloned().collect()
                 });
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1558,7 +1553,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if qubits.len() == 0 {
+            if qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1594,7 +1589,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PragmaLoop(op) => {
-            if op.circuit().len() == 0 {
+            if op.circuit().is_empty() {
                 return Ok(());
             }
             prepare_for_slice(circuit_gates, circuit_lock);
@@ -1619,7 +1614,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap_or(&0_usize).to_owned();
             let max = used_qubits.iter().max().unwrap_or(&0_usize).to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if qubits.len() == 0 {
+            if qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1671,8 +1666,8 @@ pub fn add_gate(
                 format_qubit_input(*op.control() - min, "ctrl"),
                 format_qubit_input(*op.target() - min, "targ")
             ));
-            for qubit in min + 1..max + 1 {
-                circuit_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1779,7 +1774,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PragmaControlledCircuit(op) => {
-            if op.circuit().len() == 0 {
+            if op.circuit().is_empty() {
                 return Ok(());
             }
             prepare_for_slice(circuit_gates, circuit_lock);
@@ -1801,7 +1796,7 @@ pub fn add_gate(
                 }
                 InvolvedQubits::None => {}
             }
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1809,7 +1804,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if qubits.len() == 0 {
+            if qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -1891,8 +1886,8 @@ pub fn add_gate(
                 format_qubit_input(*op.mode_0() - min, "x"),
                 format_qubit_input(*op.mode_1() - min, "x")
             ));
-            for qubit in min + 1..max + 1 {
-                bosonic_gates[qubit].push("1".to_owned());
+            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
+                gates.push("1".to_owned());
             }
             Ok(())
         }
@@ -1931,7 +1926,7 @@ pub fn add_gate(
                 }
                 InvolvedQubits::None => {}
             }
-            if used_qubits.len() == 0 {
+            if used_qubits.is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
                     msg: format!("Operations with no qubit in the input: {op:?}"),
                 });
@@ -1939,7 +1934,7 @@ pub fn add_gate(
             let min = used_qubits.iter().min().unwrap().to_owned();
             let max = used_qubits.iter().max().unwrap().to_owned();
             let qubits: Vec<usize> = (min..max + 1).collect();
-            if qubits.len() == 0 {
+            if qubits.is_empty() {
                 return Ok(());
             }
             add_qubits_vec(circuit_gates, &qubits);
@@ -2180,7 +2175,7 @@ pub fn add_gate(
                 *op.qubit(),
             ));
             bosonic_gates[*op.mode()]
-                .push(format!(r#"gate($ "|0>" -> alpha"|0>" + beta"|1>" $)"#,));
+                .push(r#"gate($ "|0>" -> alpha"|0>" + beta"|1>" $)"#.to_string());
             Ok(())
         }
         Operation::SingleExcitationLoad(op) => {
@@ -2205,7 +2200,7 @@ pub fn add_gate(
                 *op.qubit(),
             ));
             bosonic_gates[*op.mode()]
-                .push(format!(r#"gate($ alpha"|0>" + beta"|1>" -> "|0>" $)"#,));
+                .push(r#"gate($ alpha"|0>" + beta"|1>" -> "|0>" $)"#.to_string());
             Ok(())
         }
         Operation::CZQubitResonator(op) => {
@@ -2245,7 +2240,7 @@ pub fn add_gate(
                 *op.mode(),
                 *op.qubit(),
             ));
-            bosonic_gates[*op.mode()].push(format!(r#"gate($ Z $)"#,));
+            bosonic_gates[*op.mode()].push(r#"gate($ Z $)"#.to_string());
             Ok(())
         }
         Operation::DefinitionBit(op) => {

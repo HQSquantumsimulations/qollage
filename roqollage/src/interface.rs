@@ -96,13 +96,6 @@ fn flatten_qubits(circuit_gates: &mut [Vec<String>], qubits: &[usize]) {
 /// * `circuit_gates` - A vector of all the gates vectors of the circuit.
 /// * `min` - The minimum index of the circuit
 /// * `max` - The maximum index of the circuit
-///
-/// # Example:
-/// ````
-/// let circuit_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
-/// flatten_qubits(&mut circuit_gates, vec![0, 2]);
-///
-/// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
 fn push_ones(circuit_gates: &mut [Vec<String>], min: usize, max: usize) {
     for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
         gates.push("1".to_owned());

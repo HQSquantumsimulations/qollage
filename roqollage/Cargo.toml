@@ -22,7 +22,7 @@ doctest = false
 roqoqo = { version = "1.12", features = ["serialize"] }
 qoqo_calculator = { version = "1.2" }
 typst = { git = "https://github.com/typst/typst", rev = "v0.11.0" }
-typst-render = { git = "https://github.com/typst/typst", rev = "v0.11.0" }
+typst-render = { git = "https://github.com/typst/typst", rev = "v0.11.1" }
 comemo = "0.4"
 image = "0.25"
 ttf-parser = "0.21"

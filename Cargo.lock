@@ -1950,7 +1950,7 @@ dependencies = [
  "test-case",
  "time",
  "ttf-parser 0.21.1",
- "typst",
+ "typst 0.11.0",
  "typst-render",
  "ureq",
  "zune-inflate",
@@ -2725,9 +2725,70 @@ dependencies = [
  "two-face",
  "typed-arena",
  "typst-assets",
- "typst-macros",
- "typst-syntax",
- "typst-timing",
+ "typst-macros 0.11.0",
+ "typst-syntax 0.11.0",
+ "typst-timing 0.11.0",
+ "unicode-bidi",
+ "unicode-math-class",
+ "unicode-script",
+ "unicode-segmentation",
+ "usvg",
+ "wasmi",
+]
+
+[[package]]
+name = "typst"
+version = "0.11.1"
+source = "git+https://github.com/typst/typst?rev=v0.11.1#5011510270c2c23f0ab019af486b26db0d62261b"
+dependencies = [
+ "az",
+ "bitflags 2.5.0",
+ "chinese-number",
+ "ciborium",
+ "comemo",
+ "csv",
+ "ecow",
+ "fontdb",
+ "hayagriva",
+ "hypher",
+ "icu_properties",
+ "icu_provider",
+ "icu_provider_adapters",
+ "icu_provider_blob",
+ "icu_segmenter",
+ "if_chain",
+ "image 0.24.9",
+ "indexmap",
+ "kamadak-exif",
+ "kurbo",
+ "lipsum",
+ "log",
+ "once_cell",
+ "palette",
+ "phf",
+ "png",
+ "portable-atomic",
+ "qcms",
+ "rayon",
+ "regex",
+ "roxmltree",
+ "rustybuzz",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "siphasher 1.0.1",
+ "smallvec",
+ "stacker",
+ "syntect",
+ "time",
+ "toml",
+ "ttf-parser 0.20.0",
+ "two-face",
+ "typed-arena",
+ "typst-assets",
+ "typst-macros 0.11.1",
+ "typst-syntax 0.11.1",
+ "typst-timing 0.11.1",
  "unicode-bidi",
  "unicode-math-class",
  "unicode-script",
@@ -2754,9 +2815,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "typst-macros"
+version = "0.11.1"
+source = "git+https://github.com/typst/typst?rev=v0.11.1#5011510270c2c23f0ab019af486b26db0d62261b"
+dependencies = [
+ "heck 0.4.1",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.65",
+]
+
+[[package]]
 name = "typst-render"
-version = "0.11.0"
-source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
+version = "0.11.1"
+source = "git+https://github.com/typst/typst?rev=v0.11.1#5011510270c2c23f0ab019af486b26db0d62261b"
 dependencies = [
  "bytemuck",
  "comemo",
@@ -2767,9 +2839,9 @@ dependencies = [
  "roxmltree",
  "tiny-skia",
  "ttf-parser 0.20.0",
- "typst",
- "typst-macros",
- "typst-timing",
+ "typst 0.11.1",
+ "typst-macros 0.11.1",
+ "typst-timing 0.11.1",
  "usvg",
 ]
 
@@ -2790,6 +2862,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "typst-syntax"
+version = "0.11.1"
+source = "git+https://github.com/typst/typst?rev=v0.11.1#5011510270c2c23f0ab019af486b26db0d62261b"
+dependencies = [
+ "comemo",
+ "ecow",
+ "once_cell",
+ "serde",
+ "unicode-ident",
+ "unicode-math-class",
+ "unicode-script",
+ "unicode-segmentation",
+ "unscanny",
+]
+
+[[package]]
 name = "typst-timing"
 version = "0.11.0"
 source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
@@ -2797,7 +2885,18 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
- "typst-syntax",
+ "typst-syntax 0.11.0",
+]
+
+[[package]]
+name = "typst-timing"
+version = "0.11.1"
+source = "git+https://github.com/typst/typst?rev=v0.11.1#5011510270c2c23f0ab019af486b26db0d62261b"
+dependencies = [
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "typst-syntax 0.11.1",
 ]
 
 [[package]]

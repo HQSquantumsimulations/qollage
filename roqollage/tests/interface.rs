@@ -15,8 +15,8 @@
 
 use ndarray::array;
 use qoqo_calculator::CalculatorFloat;
-use roqoqo::{operations::*, Circuit};
 use roqollage::add_gate;
+use roqoqo::{operations::*, Circuit};
 use std::collections::HashMap;
 use std::f64::consts::PI;
 use test_case::test_case;

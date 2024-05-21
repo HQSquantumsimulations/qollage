@@ -117,8 +117,7 @@ impl TypstBackend {
     /// * `path` `The path where to save the downloaded font file
     fn download_font(path: PathBuf) -> Result<Vec<u8>, RoqoqoBackendError> {
         std::fs::create_dir_all(
-            path
-                .parent()
+            path.parent()
                 .unwrap_or(PathBuf::from(".qollage/fonts/").as_path()),
         )
         .map_err(|_| RoqoqoBackendError::FileAlreadyExists {
@@ -323,9 +322,8 @@ impl FromStr for RenderPragmas {
             "all" => Ok(RenderPragmas::All),
             _ => Ok(RenderPragmas::Partial(
                 s.split(',')
-                    .filter(|&gate_name| gate_name
-                            .trim()
-                            .starts_with("Pragma")).map(|gate_name| gate_name.trim().to_owned())
+                    .filter(|&gate_name| gate_name.trim().starts_with("Pragma"))
+                    .map(|gate_name| gate_name.trim().to_owned())
                     .collect(),
             )),
         }

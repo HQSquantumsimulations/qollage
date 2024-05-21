@@ -353,7 +353,7 @@ SOFTWARE.
 
 
 ====================================================
-anyhow 1.0.83
+anyhow 1.0.86
 https://github.com/dtolnay/anyhow
 by David Tolnay <dtolnay@gmail.com>
 Flexible concrete Error type built on std::error::Error
@@ -4821,7 +4821,7 @@ THE SOFTWARE.
 
 
 ====================================================
-cc 1.0.97
+cc 1.0.98
 https://github.com/rust-lang/cc-rs
 by Alex Crichton <alex@alexcrichton.com>
 A build-time dependency for Cargo build scripts to assist in invoking the native
@@ -6250,7 +6250,7 @@ LICENSE:
 
 
 ====================================================
-citationberg 0.3.0
+citationberg 0.3.1
 https://github.com/typst/citationberg
 by Martin Haug <mhaug@live.de>
 A parser for CSL files
@@ -6997,7 +6997,7 @@ Extension trait for full float functionality in `#[no_std]` backed by `libm`.
 License: MIT
 
 ====================================================
-crc32fast 1.4.0
+crc32fast 1.4.2
 https://github.com/srijs/rust-crc32fast
 by Sam Rijs <srijs@airpost.net>, Alex Crichton <alex@alexcrichton.com>
 Fast, SIMD-accelerated CRC32 (IEEE) checksum computation
@@ -7721,7 +7721,7 @@ limitations under the License.
 
 
 ====================================================
-crossbeam-utils 0.8.19
+crossbeam-utils 0.8.20
 https://github.com/crossbeam-rs/crossbeam/tree/master/crossbeam-utils
 by 
 Utilities for concurrent programming
@@ -9488,7 +9488,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-either 1.11.0
+either 1.12.0
 https://github.com/rayon-rs/either
 by bluss
 The enum `Either` with variants `Left` and `Right` is a general purpose sum type with two cases.
@@ -13650,7 +13650,7 @@ limitations under the License.
 
 
 ====================================================
-hayagriva 0.5.2
+hayagriva 0.5.3
 https://github.com/typst/hayagriva
 by Martin Haug <mhaug@live.de>
 Work with references: Literature database management, storage, and citation formatting
@@ -19267,7 +19267,7 @@ limitations under the License.
 
 
 ====================================================
-linux-raw-sys 0.4.13
+linux-raw-sys 0.4.14
 https://github.com/sunfishcode/linux-raw-sys
 by Dan Gohman <dev@sunfishcode.online>
 Generated bindings for Linux's userspace API
@@ -20930,7 +20930,7 @@ limitations under the License.
 
 
 ====================================================
-miniz_oxide 0.7.2
+miniz_oxide 0.7.3
 https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide
 by Frommi <daniil.liferenko@gmail.com>, oyvindln <oyvindln@users.noreply.github.com>
 DEFLATE compression and decompression library rewritten in Rust based on miniz
@@ -27242,7 +27242,7 @@ limitations under the License.
 
 
 ====================================================
-proc-macro2 1.0.82
+proc-macro2 1.0.83
 https://github.com/dtolnay/proc-macro2
 by David Tolnay <dtolnay@gmail.com>, Alex Crichton <alex@alexcrichton.com>
 A substitute implementation of the compiler's `proc_macro` API to decouple token-based libraries from the procedural macro use case.
@@ -35878,7 +35878,7 @@ limitations under the License.
 
 
 ====================================================
-rustls-webpki 0.102.3
+rustls-webpki 0.102.4
 https://github.com/rustls/webpki
 by 
 Web PKI X.509 Certificate Verification.
@@ -36537,7 +36537,7 @@ You may use this code under the terms of either license.
 
 
 ====================================================
-schemars 0.8.19
+schemars 0.8.20
 https://graham.cool/schemars/
 by Graham Esau <gesau@hotmail.co.uk>
 Generate JSON Schemas from Rust code
@@ -36569,7 +36569,7 @@ SOFTWARE.
 
 
 ====================================================
-schemars_derive 0.8.19
+schemars_derive 0.8.20
 https://graham.cool/schemars/
 by Graham Esau <gesau@hotmail.co.uk>
 Macros for #[derive(JsonSchema)], for use with schemars
@@ -37703,7 +37703,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-serde_spanned 0.6.5
+serde_spanned 0.6.6
 https://github.com/toml-rs/toml
 by 
 Serde-compatible spanned Value
@@ -40704,7 +40704,7 @@ limitations under the License.
 
 
 ====================================================
-syn 2.0.63
+syn 2.0.65
 https://github.com/dtolnay/syn
 by David Tolnay <dtolnay@gmail.com>
 Parser for Rust source code
@@ -41779,7 +41779,7 @@ SOFTWARE.
 
 
 ====================================================
-thiserror 1.0.60
+thiserror 1.0.61
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 derive(Error)
@@ -41993,7 +41993,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-thiserror-impl 1.0.60
+thiserror-impl 1.0.61
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 Implementation detail of the `thiserror` crate
@@ -43536,7 +43536,7 @@ freely, subject to the following restrictions:
 
 
 ====================================================
-toml 0.8.12
+toml 0.8.13
 https://github.com/toml-rs/toml
 by Alex Crichton <alex@alexcrichton.com>
 A native Rust encoder and decoder of TOML-formatted files and streams. Provides
@@ -43775,7 +43775,7 @@ LICENSE-APACHE:
 
 
 ====================================================
-toml_datetime 0.6.5
+toml_datetime 0.6.6
 https://github.com/toml-rs/toml
 by Alex Crichton <alex@alexcrichton.com>
 A TOML-compatible datetime type
@@ -44011,7 +44011,7 @@ LICENSE-APACHE:
 
 
 ====================================================
-toml_edit 0.22.12
+toml_edit 0.22.13
 https://github.com/toml-rs/toml
 by Andronik Ordian <write@reusable.software>, Ed Page <eopage@gmail.com>
 Yet another format-preserving TOML parser.
@@ -45237,7 +45237,7 @@ A new markup-based typesetting system that is powerful and easy to learn.
 License: Apache-2.0
 
 ====================================================
-typst-assets 0.11.0
+typst-assets 0.11.1
 https://typst.app
 by The Typst Project Developers
 Assets for the Typst compiler.
@@ -54086,7 +54086,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ====================================================
-wide 0.7.19
+wide 0.7.20
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.

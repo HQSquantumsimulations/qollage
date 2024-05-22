@@ -30,7 +30,7 @@ def draw_circuit(
              - `"all"` to render every pragmas.\n
              - `"none"` to not render any pragmas.\n
              - `"PragmaOperation1, PragmaOperation2"` to render only some pragmas.
-         * initialization_mode (str, optional): What to display at the begginning of the circuit:\n
+         * initialization_mode (str, optional): What to display at the beginning of the circuit:\n
              - "state" for "|0>". Used if None. \n
              - "qubit" for "q[n]".\n
 
@@ -58,7 +58,7 @@ def save_circuit(
              - "all" to render every pragmas.\n
              - "none" to not render any pragmas.\n
              - "PragmaOperation1, PragmaOperation2" to render only some pragmas.
-         * initialization_mode (str, optional): What to display at the begginning of the circuit:\n
+         * initialization_mode (str, optional): What to display at the beginning of the circuit:\n
              - "state" for "|0>". Used if None. \n
              - "qubit" for "q[n]".\n
 
@@ -83,7 +83,7 @@ def circuit_to_typst_str(
              - "all" to render every pragmas.\n
              - "none" to not render any pragmas.\n
              - "PragmaOperation1, PragmaOperation2" to render only some pragmas.
-         * initialization_mode (str, optional): What to display at the begginning of the circuit:\n
+         * initialization_mode (str, optional): What to display at the beginning of the circuit:\n
              - "state" for "|0>". Used if None. \n
              - "qubit" for "q[n]".\n
 

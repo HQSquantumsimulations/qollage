@@ -180,9 +180,9 @@ checksum = "7c12d1856e42f0d817a835fe55853957c85c8c8a470114029143d3f12671446e"
 
 [[package]]
 name = "built"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41bfbdb21256b87a8b5e80fab81a8eed158178e812fd7ba451907518b2742f16"
+checksum = "c6a6c0b39c38fd754ac338b00a88066436389c0f029da5d37d1e01091d9b7c17"
 
 [[package]]
 name = "bumpalo"
@@ -1645,7 +1645,8 @@ dependencies = [
 [[package]]
 name = "qoqo"
 version = "1.12.0"
-source = "git+https://github.com/dberthault/qoqo.git?branch=Pyo3_0.12_update#32521bee02cbae334a6a8636aa2e2cdbd6be392c"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bde54d25aca476d8a85c7a4f7ed3e42057399781559f883d1a3f29fdfd520178"
 dependencies = [
  "bincode",
  "ndarray",
@@ -1671,7 +1672,8 @@ dependencies = [
 [[package]]
 name = "qoqo-macros"
 version = "1.12.0"
-source = "git+https://github.com/dberthault/qoqo.git?branch=Pyo3_0.12_update#32521bee02cbae334a6a8636aa2e2cdbd6be392c"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3b01add6173d33a9aca23c0a7d3e80ae96163194de7065bf965dcb64fc50b05"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1959,7 +1961,8 @@ dependencies = [
 [[package]]
 name = "roqoqo"
 version = "1.12.0"
-source = "git+https://github.com/dberthault/qoqo.git?branch=Pyo3_0.12_update#32521bee02cbae334a6a8636aa2e2cdbd6be392c"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ddf32910fc2274cfc7eb825376ad5806ab1272b2857bd540f6cda1e1d8b15e55"
 dependencies = [
  "bincode",
  "nalgebra",
@@ -1981,7 +1984,8 @@ dependencies = [
 [[package]]
 name = "roqoqo-derive"
 version = "1.12.0"
-source = "git+https://github.com/dberthault/qoqo.git?branch=Pyo3_0.12_update#32521bee02cbae334a6a8636aa2e2cdbd6be392c"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99bcb506f25ffed16cf1974cf67d29060526759521d88f3d947e2ae930b65b8c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2309,8 +2313,9 @@ dependencies = [
 
 [[package]]
 name = "struqture"
-version = "1.7.0"
-source = "git+https://github.com/dberthault/struqture.git#f00e5a1fe18c56b9ab2b3cdb1dbe5a35cfecfd63"
+version = "1.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "628779c97f727781bb4b9c20d32c1410bf9c86e32090a0841336d7cf6dae7a49"
 dependencies = [
  "itertools",
  "ndarray",
@@ -2325,8 +2330,9 @@ dependencies = [
 
 [[package]]
 name = "struqture-py"
-version = "1.7.0"
-source = "git+https://github.com/dberthault/struqture.git#f00e5a1fe18c56b9ab2b3cdb1dbe5a35cfecfd63"
+version = "1.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fecd0d102b86be41793c8171abaadb5fbf66deae98e073157d08425dff4ea6c9"
 dependencies = [
  "bincode",
  "num-complex",
@@ -2348,8 +2354,9 @@ dependencies = [
 
 [[package]]
 name = "struqture-py-macros"
-version = "1.7.0"
-source = "git+https://github.com/dberthault/struqture.git#f00e5a1fe18c56b9ab2b3cdb1dbe5a35cfecfd63"
+version = "1.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ee99da17f9722dec22ca98af056a7d3623d50d4894e53f6850c1be1e7dc02e3"
 dependencies = [
  "num-complex",
  "proc-macro2",
@@ -2677,8 +2684,9 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
 name = "typst"
-version = "0.11.0"
-source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12492297d20937494f0143ae50ef339e5fd3d927b4096af1c52fe73fb9c5fa9a"
 dependencies = [
  "az",
  "bitflags 2.5.0",
@@ -2744,8 +2752,9 @@ checksum = "2b3061f8d268e8eec7481c9ab24540455cb4912983c49aae38fa6e8bf8ef4d9c"
 
 [[package]]
 name = "typst-macros"
-version = "0.11.0"
-source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5a0fdfd46b4920b0f8e4215e5b8438c737e8bc3498a681ea59b0130228363fc"
 dependencies = [
  "heck 0.4.1",
  "proc-macro2",
@@ -2755,8 +2764,9 @@ dependencies = [
 
 [[package]]
 name = "typst-render"
-version = "0.11.0"
-source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6f122fa9fde65683fde5ac444ecfbdc1a5ad4822dbaa537fe278345bb6b6ad7e"
 dependencies = [
  "bytemuck",
  "comemo",
@@ -2775,8 +2785,9 @@ dependencies = [
 
 [[package]]
 name = "typst-syntax"
-version = "0.11.0"
-source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3db69f2f41613b1ff6edbec44fd7dc524137f099ee36c46f560cedeaadb40c4"
 dependencies = [
  "comemo",
  "ecow",
@@ -2791,8 +2802,9 @@ dependencies = [
 
 [[package]]
 name = "typst-timing"
-version = "0.11.0"
-source = "git+https://github.com/typst/typst?rev=v0.11.0#2bf9f95dd83f2ceef1e32ae1847a162c7d193f76"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b58e17192bcacb2a39aace6d3eece70f008b2949ce384ac501a58357fafee67"
 dependencies = [
  "parking_lot",
  "serde",

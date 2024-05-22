@@ -116,7 +116,7 @@ fn push_ones(circuit_gates: &mut [Vec<String>], min: usize, max: usize) {
 /// ````
 /// let circuit_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
 /// let bosonic_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
-/// flatten_qubits(&mut circuit_gates, &mut bosonic_gates, vec![0, 2], vec![1]);
+/// flatten_multiple_vec(&mut circuit_gates, &mut bosonic_gates, vec![0, 2], vec![1]);
 ///
 /// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
 /// assert_eq!(bosonic_gates, vec![vec!["$H$", "1"], vec!["$H$", "1"], vec![]]);

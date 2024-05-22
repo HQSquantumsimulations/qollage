@@ -17,6 +17,7 @@ from qoqo import Circuit, operations as ops  # type: ignore
 
 
 def test_simple_draw() -> None:
+    """Test drawing a circuit"""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
 

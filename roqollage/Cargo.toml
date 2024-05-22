@@ -8,7 +8,7 @@ rust-version = "1.56"
 categories = ["science", "simulation"]
 readme = "README.md"
 repository = "https://github.com/HQSquantumsimulations/qollage"
-description = "Typst interface for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations"
+description = "Visualization tool for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations"
 include = ["src*", "LICENSE", "README.md"]
 
 [lib]

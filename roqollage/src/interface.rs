@@ -1895,8 +1895,8 @@ pub fn add_gate(
             Ok(())
         }
         Operation::Identity(op) => {
-            add_qubits_vec(bosonic_gates, &[*op.qubit()]);
-            bosonic_gates[*op.qubit()].push("$ I $".to_owned());
+            add_qubits_vec(circuit_gates, &[*op.qubit()]);
+            circuit_gates[*op.qubit()].push("$ I $".to_owned());
             Ok(())
         }
         Operation::PragmaAnnotatedOp(op) => {

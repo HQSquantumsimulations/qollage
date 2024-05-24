@@ -1671,9 +1671,9 @@ dependencies = [
 
 [[package]]
 name = "qoqo-macros"
-version = "1.12.0"
+version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3b01add6173d33a9aca23c0a7d3e80ae96163194de7065bf965dcb64fc50b05"
+checksum = "bd5a9a2e3a4bf32052e6f5debae72a7516509abf4abcd35a3fbbdf2c28513282"
 dependencies = [
  "proc-macro2",
  "quote",

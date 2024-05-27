@@ -120,8 +120,8 @@ impl TypstBackend {
             path.parent()
                 .unwrap_or(PathBuf::from(".qollage/fonts/").as_path()),
         )
-        .map_err(|_| RoqoqoBackendError::FileAlreadyExists {
-            path: path.to_str().unwrap_or_default().to_owned(),
+        .map_err(|err| RoqoqoBackendError::GenericError {
+            msg: format!("Couldn't create the font directory: {err}."),
         })?;
         let url = "https://mirror.clientvps.com/CTAN/fonts/firamath/FiraMath-Regular.otf";
 
@@ -138,13 +138,11 @@ impl TypstBackend {
                 msg: format!("Couldn't read the font file: {err}."),
             })?;
         let mut file =
-            std::fs::File::create(&path).map_err(|_| RoqoqoBackendError::FileAlreadyExists {
-                path: path.to_str().unwrap_or_default().to_owned(),
+            std::fs::File::create(&path).map_err(|err| RoqoqoBackendError::GenericError {
+                msg: format!("Couldn't create the font file: {err}."),
             })?;
-        std::fs::File::write(&mut file, &data).map_err(|_| {
-            RoqoqoBackendError::FileAlreadyExists {
-                path: path.to_str().unwrap_or_default().to_owned(),
-            }
+        std::fs::File::write(&mut file, &data).map_err(|err| RoqoqoBackendError::GenericError {
+            msg: format!("Couldn't write the font file: {err}."),
         })?;
         std::fs::read(path).map_err(|err| RoqoqoBackendError::GenericError {
             msg: format!("Couldn't read the font file: {err}"),
@@ -319,7 +317,7 @@ impl FromStr for RenderPragmas {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             "none" => Ok(RenderPragmas::None),
-            "all" => Ok(RenderPragmas::All),
+            "all" | "" => Ok(RenderPragmas::All),
             _ => Ok(RenderPragmas::Partial(
                 s.split(',')
                     .filter(|&gate_name| gate_name.trim().starts_with("Pragma"))

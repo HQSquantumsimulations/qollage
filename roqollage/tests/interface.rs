@@ -11,9 +11,9 @@
 // limitations under the License.
 //
 //! Testing the roqollage Interface
-//! run with `RUST_TEST_THREADS=1 cargo test`
 
 use ndarray::array;
+use num_complex::Complex64;
 use qoqo_calculator::CalculatorFloat;
 use roqollage::add_gate;
 use roqoqo::{operations::*, Circuit};
@@ -42,11 +42,13 @@ use test_case::test_case;
 #[test_case(Operation::from(Toffoli::new(0, 1, 2)); "Toffoli")]
 #[test_case(Operation::from(GateDefinition::new(vec![Operation::from(RotateX::new(0, CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1, CalculatorFloat::PI))].into_iter().collect(), "test_gate".to_owned(), vec![0, 1], vec!["theta".to_owned()])); "GateDefinition")]
 #[test_case(Operation::from(CallDefinedGate::new("test".to_owned(), vec![0, 1], vec![CalculatorFloat::from("3.14")])); "CallDefinedGate")]
-#[test_case(Operation::from(PragmaConditional::new("q".to_owned(), 0, Circuit::new())); "PragmaConditional")]
-#[test_case(Operation::from(PragmaLoop::new(CalculatorFloat::Float(5.2), Circuit::new())); "PragmaLoop")]
+#[test_case(Operation::from(PragmaConditional::new("q".to_owned(), 0, Circuit::new())); "PragmaConditionalEmpty")]
+#[test_case(Operation::from(PragmaConditional::new("q".to_owned(), 0, [Operation::from(RotateX::new(0,CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1,CalculatorFloat::from("pi")))].into_iter().collect())); "PragmaConditional")]
+#[test_case(Operation::from(PragmaLoop::new(CalculatorFloat::Float(5.2), vec![Operation::from(RotateX::new(0, CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1, CalculatorFloat::PI))].into_iter().collect())); "PragmaLoop")]
 #[test_case(Operation::from(MultiQubitZZ::new(vec![0, 1], CalculatorFloat::from(-PI))); "MultiqubitZZ")]
 #[test_case(Operation::from(XY::new(0, 1, CalculatorFloat::PI)); "XY")]
 #[test_case(Operation::from(InvSqrtPauliX::new(0)); "InvSqrtPauliX")]
+#[test_case(Operation::from(SqrtPauliX::new(0)); "SqrtPauliX")]
 #[test_case(Operation::from(Identity::new(0)); "Identity")]
 #[test_case(Operation::from(PMInteraction::new(0, 1, CalculatorFloat::from(0.069))); "PMInteraction")]
 #[test_case(Operation::from(GivensRotation::new(0, 1, CalculatorFloat::from("5"), CalculatorFloat::FRAC_1_SQRT_2)); "GivensRotation")]
@@ -79,11 +81,11 @@ use test_case::test_case;
 #[test_case(Operation::from(PhaseShift::new(0, 1.0.into())); "PhaseShift")]
 #[test_case(Operation::from(PhaseDisplacement::new(0, 1.0.into(), 0.1.into())); "PhaseDisplacement")]
 #[test_case(Operation::from(QuantumRabi::new(1, 0, 1.0.into()));"QuantumRabi")]
-#[test_case(Operation::from(LongitudinalCoupling::new(1, 0, 1.0.into()));"LongitudinalCoupling")]
-#[test_case(Operation::from(JaynesCummings::new(1, 0, 1.0.into()));"JaynesCummings")]
-#[test_case(Operation::from(SingleExcitationLoad::new(1, 0));"SingleExcitationLoad")]
-#[test_case(Operation::from(SingleExcitationStore::new(1, 0));"SingleExcitationStore")]
-#[test_case(Operation::from(CZQubitResonator::new(1, 0));"CZQubitResonator")]
+#[test_case(Operation::from(LongitudinalCoupling::new(1, 2, 1.0.into()));"LongitudinalCoupling")]
+#[test_case(Operation::from(JaynesCummings::new(1, 2, 1.0.into()));"JaynesCummings")]
+#[test_case(Operation::from(SingleExcitationLoad::new(1, 1));"SingleExcitationLoad")]
+#[test_case(Operation::from(SingleExcitationStore::new(1, 1));"SingleExcitationStore")]
+#[test_case(Operation::from(CZQubitResonator::new(1, 2));"CZQubitResonator")]
 #[test_case(Operation::from(PragmaSetNumberOfMeasurements::new(3, "ro".into())); "PragmaSetNumberOfMeasurements")]
 #[test_case(Operation::from(PragmaRepeatGate::new(3)); "PragmaRepeatGate")]
 #[test_case(Operation::from(PragmaGeneralNoise::new(0, 1.0.into(),  array![[0.1, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]])); "PragmaGeneralNoise")]
@@ -96,7 +98,7 @@ use test_case::test_case;
 #[test_case(Operation::from(InputSymbolic::new("ro".into(), 2.0)); "InputSymbolic")]
 #[test_case(Operation::from(PragmaDamping::new(0, 0.01.into(),  2.0.into())); "PragmaDamping001")]
 #[test_case(Operation::from(PragmaDephasing::new(0, 0.01.into(),  2.0.into())); "PragmaDephasing")]
-#[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([(0, 0)]), "ro".into(), roqoqo::Circuit::new(),)); "PragmaGetPauliProduct")]
+#[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([(0, 0), (1,1), (2,2), (3,3)]), "ro".into(), roqoqo::Circuit::new(),)); "PragmaGetPauliProduct")]
 #[test_case(Operation::from(PragmaActiveReset::new(0)); "PragmaActiveReset")]
 #[test_case(Operation::from(PragmaSleep::new(vec![0],0.0.into())); "PragmaSleep")]
 #[test_case(Operation::from(PragmaRepeatedMeasurement::new( "ro".to_string(), 10, None)); "PragmaRepeatedMeasurement")]
@@ -105,8 +107,19 @@ use test_case::test_case;
 #[test_case(Operation::from(DefinitionComplex::new("ro".into(), 2, false)); "DefinitionComplex")]
 #[test_case(Operation::from(PragmaGetOccupationProbability::new("ro".into(), None)); "PragmaGetOccupationProbability")]
 #[test_case(Operation::from(InputBit::new(String::from("test"), 1, false)); "InputBit")]
-#[test_case(Operation::from(PragmaControlledCircuit::new(10, roqoqo::Circuit::new())); "PragmaControlledCircuit")]
-#[test_case(Operation::from(PragmaAnnotatedOp::new(PauliX::new(0).into(), "test".to_string())))]
+#[test_case(Operation::from(PhaseShiftState0::new(0, CalculatorFloat::PI)); "PhaseShiftState0")]
+// #[test_case(Operation::from(); "")]
+#[test_case(Operation::from(PhotonDetection::new(0, "ro".to_owned(), 0)); "PhotonDetection")]
+#[test_case(Operation::from(PragmaGetDensityMatrix::new("ro".to_owned(), None)); "PragmaGetDensityMatrix")]
+#[test_case(Operation::from(PragmaChangeDevice::new(&Operation::from(PragmaOverrotation::new("RotateX".to_owned(), vec![0,1], 0.1, 0.1))).unwrap()); "PragmaChangeDevice")]
+#[test_case(Operation::from(PragmaRandomNoise::new(0, CalculatorFloat::ONE, CalculatorFloat::from(0.1), CalculatorFloat::from(0.1))); "PragmaRandomNoise")]
+#[test_case(Operation::from(PragmaDepolarising::new(0, CalculatorFloat::from("1.0"), CalculatorFloat::from("theta"))); "PragmaDepolarising")]
+#[test_case(Operation::from(PragmaOverrotation::new("RotateX".to_owned(), vec![0,1], 0.1, 0.1)); "PragmaOverrotation")]
+#[test_case(Operation::from(PragmaControlledCircuit::new(10, vec![Operation::from(RotateX::new(0, CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1, CalculatorFloat::PI))].into_iter().collect())); "PragmaControlledCircuit")]
+#[test_case(Operation::from(PragmaAnnotatedOp::new(PauliX::new(0).into(), "test".to_string())); "PragmaAnnotatedOp")]
+#[test_case(Operation::from(PragmaGetStateVector::new("ro".to_owned(), None)); "PragmaGetStateVector")]
+#[test_case(Operation::from(PragmaSetStateVector::new(array![Complex64::new(0.0, 0.0),Complex64::new(1.0 / (2.0_f64).sqrt(), 0.0),Complex64::new(-1.0 / (2.0_f64).sqrt(), 0.0),Complex64::new(0.0, 0.0) ])); "PragmaSetStateVector")]
+#[test_case(Operation::from(PragmaSetDensityMatrix::new(array![[Complex64::new(1.0, 0.0), Complex64::new(0.0, 0.0)],[Complex64::new(0.0, 0.0), Complex64::new(0.0, 0.0)],])); "PragmaSetDensityMatrix")]
 
 fn test_add_gate(operation: Operation) {
     let mut circuit_gates: Vec<Vec<String>> = Vec::new();
@@ -125,4 +138,41 @@ fn test_add_gate(operation: Operation) {
         &operation,
     )
     .unwrap();
+}
+
+#[test_case(Operation::from(PragmaStartDecompositionBlock::new(vec![], HashMap::new())); "PragmaStartDecompositionBlock")]
+#[test_case(Operation::from(PragmaStopDecompositionBlock::new(vec![])); "PragmaStopDecompositionBlock")]
+#[test_case(Operation::from(PragmaOverrotation::new("RotateX".to_owned(), vec![], 0.1, 0.1)); "PragmaOverrotation")]
+#[test_case(Operation::from(PragmaStopParallelBlock::new(vec![], 0.5.into())); "PragmaStopParallelBlock")]
+#[test_case(Operation::from(PragmaSleep::new(vec![], 0.0.into())); "PragmaSleep")]
+#[test_case(Operation::from(MultiQubitMS::new(vec![], 0.0.into())); "MultiQubitMS")]
+#[test_case(Operation::from(MultiQubitZZ::new(vec![], 0.0.into())); "MultiQubitZZ")]
+#[test_case(Operation::from(PragmaGetDensityMatrix::new("ro".to_owned(), Some(Circuit::new()))); "PragmaGetDensityMatrix")]
+#[test_case(Operation::from(PragmaGetStateVector::new("ro".to_owned(), Some(Circuit::new()))); "PragmaGetStateVector")]
+#[test_case(Operation::from(PragmaRepeatedMeasurement::new("ro".to_owned(), 5, Some(HashMap::from([])))); "PragmaRepeatedMeasurement")]
+#[test_case(Operation::from(PragmaGetOccupationProbability::new("ro".to_owned(), Some(Circuit::new()))); "PragmaGetOccupationProbability")]
+#[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([(4, 4)]), "ro".into(), Circuit::new(),)); "PragmaGetPauliProduct")]
+#[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([]), "ro".into(), Circuit::new(),)); "PragmaGetPauliProduct2")]
+#[test_case(Operation::from(PragmaAnnotatedOp::new(InputBit::new("ro".to_owned(), 0, true).into(), "test".to_string())); "PragmaAnnotatedOp")]
+#[test_case(Operation::from(CallDefinedGate::new("test".to_owned(), vec![], vec![CalculatorFloat::from("3.14")])); "CallDefinedGate")]
+#[test_case(Operation::from(PragmaControlledCircuit::new(10, vec![Operation::from(InputBit::new("ro".to_owned(), 0, true))].into_iter().collect())); "PragmaControlledCircuit")]
+#[test_case(Operation::from(GateDefinition::new(vec![Operation::from(InputBit::new("ro".to_owned(), 0, true))].into_iter().collect(), "test_gate".to_owned(), vec![0, 1], vec!["theta".to_owned()])); "GateDefinition")]
+
+fn test_add_gate_errors(operation: Operation) {
+    let mut circuit_gates: Vec<Vec<String>> = Vec::new();
+    let mut bosonic_gates: Vec<Vec<String>> = Vec::new();
+    let mut classical_gates: Vec<Vec<String>> = Vec::new();
+    let mut circuit_lock: Vec<(usize, usize)> = Vec::new();
+    let mut bosonic_lock: Vec<(usize, usize)> = Vec::new();
+    let mut classical_lock: Vec<(usize, usize)> = Vec::new();
+    assert!(add_gate(
+        &mut circuit_gates,
+        &mut bosonic_gates,
+        &mut classical_gates,
+        &mut circuit_lock,
+        &mut bosonic_lock,
+        &mut classical_lock,
+        &operation,
+    )
+    .is_err(),);
 }

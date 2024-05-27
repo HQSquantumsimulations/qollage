@@ -12,7 +12,7 @@
 
 import pytest  # type: ignore
 import sys
-from qollage import draw_circuit
+from qollage import draw_circuit, save_circuit, circuit_to_typst_str
 from qoqo import Circuit, operations as ops  # type: ignore
 
 
@@ -22,6 +22,8 @@ def test_simple_draw() -> None:
     circuit += ops.Hadamard(0)
 
     draw_circuit(circuit)
+    typst_str = circuit_to_typst_str(circuit)
+    save_circuit(circuit)
 
 
 if __name__ == "__main__":

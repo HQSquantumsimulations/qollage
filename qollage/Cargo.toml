@@ -19,8 +19,13 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qoqo = { version = "1.12", default-features = false, features = [] }
-roqoqo = { version = "1.12", features = ["serialize"] }
+qoqo = { version = "1.13", default-features = false, features = [
+    "unstable_operation_definition",
+] }
+roqoqo = { version = "1.13", features = [
+    "serialize",
+    "unstable_operation_definition",
+] }
 roqollage = { version = "0.1", path = "../roqollage" }
 image = "0.25"
 
@@ -31,6 +36,7 @@ features = ["num-complex"]
 [dev-dependencies]
 test-case = "3.0"
 qoqo_calculator = "1.2"
+qoqo_calculator_pyo3 = { version = "1.2", default-features = false }
 ndarray = "0.15"
 
 [build-dependencies]

@@ -1637,6 +1637,7 @@ dependencies = [
  "pyo3-build-config 0.21.2",
  "qoqo",
  "qoqo_calculator",
+ "qoqo_calculator_pyo3",
  "roqollage",
  "roqoqo",
  "test-case",

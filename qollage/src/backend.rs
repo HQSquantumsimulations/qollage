@@ -55,11 +55,7 @@ pub fn save_circuit(
     let image = circuit_to_image(
         &circuit,
         Some(pixel_per_point),
-        RenderPragmas::from_str(render_pragmas).map_err(|x| {
-            PyValueError::new_err(format!(
-                "Error: render_pragmas is not in a suitable format: {x:?}"
-            ))
-        })?,
+        RenderPragmas::from_str(render_pragmas).unwrap(),
         initialization_mode,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
@@ -127,11 +123,7 @@ pub fn draw_circuit(
     let image = circuit_to_image(
         &circuit,
         Some(pixel_per_point),
-        RenderPragmas::from_str(render_pragmas).map_err(|x| {
-            PyValueError::new_err(format!(
-                "Error: render_pragmas is not in a suitable format: {x:?}"
-            ))
-        })?,
+        RenderPragmas::from_str(render_pragmas).unwrap(),
         initialization_mode,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
@@ -192,11 +184,7 @@ pub fn circuit_to_typst_str(
         .map_err(|x| PyValueError::new_err(format!("Initialization mode not accepted: {x:?}")))?;
     circuit_into_typst_str(
         &circuit,
-        RenderPragmas::from_str(render_pragmas).map_err(|x| {
-            PyValueError::new_err(format!(
-                "Error: render_pragmas is not in a suitable format: {x:?}"
-            ))
-        })?,
+        RenderPragmas::from_str(render_pragmas).unwrap(),
         initialization_mode,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))

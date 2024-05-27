@@ -1,3 +1,5 @@
 pytest
 qoqo
 qollage
+pillow
+ipython

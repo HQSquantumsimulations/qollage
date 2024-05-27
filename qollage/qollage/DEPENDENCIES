@@ -14617,13 +14617,13 @@ by The ICU4X Project Developers
 Data for the icu_locid_transform crate
 
 ====================================================
-icu_properties 1.4.0
+icu_properties 1.4.1
 https://icu4x.unicode.org
 by The ICU4X Project Developers
 Definitions for Unicode properties
 
 ====================================================
-icu_properties_data 1.4.0
+icu_properties_data 1.4.1
 https://icu4x.unicode.org
 by The ICU4X Project Developers
 Data for the icu_properties crate
@@ -24194,7 +24194,7 @@ limitations under the License.
 
 
 ====================================================
-parking_lot 0.12.2
+parking_lot 0.12.3
 https://github.com/Amanieu/parking_lot
 by Amanieu d'Antras <amanieu@gmail.com>
 More compact and efficient implementations of the standard synchronization primitives.
@@ -27242,7 +27242,7 @@ limitations under the License.
 
 
 ====================================================
-proc-macro2 1.0.83
+proc-macro2 1.0.84
 https://github.com/dtolnay/proc-macro2
 by David Tolnay <dtolnay@gmail.com>, Alex Crichton <alex@alexcrichton.com>
 A substitute implementation of the compiler's `proc_macro` API to decouple token-based libraries from the procedural macro use case.
@@ -29327,7 +29327,7 @@ limitations under the License.
 qollage 0.1.0
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
-Typst interface for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations
+Visualization tool for qoqo quantum computing toolkit by HQS Quantum Simulations
 License: Apache-2.0
 ----------------------------------------------------
 LICENSE:
@@ -29536,7 +29536,7 @@ LICENSE:
 
 
 ====================================================
-qoqo 1.12.0
+qoqo 1.13.0
 https://github.com/HQSquantumsimulations/qoqo
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Quantum computing circuit toolkit. Python interface of roqoqo
@@ -29748,7 +29748,7 @@ LICENSE:
 
 
 ====================================================
-qoqo-macros 1.12.0
+qoqo-macros 1.13.0
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for the qoqo crate
 License: Apache-2.0
@@ -33806,7 +33806,7 @@ Safe, fast, small crypto using Rust.
 roqollage 0.1.0
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
-Typst interface for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations
+Visualization tool for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations
 License: Apache-2.0
 ----------------------------------------------------
 LICENSE:
@@ -34015,7 +34015,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo 1.12.0
+roqoqo 1.13.0
 https://github.com/HQSquantumsimulations/qoqo
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Rust Quantum Computing Toolkit by HQS
@@ -34227,7 +34227,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo-derive 1.12.0
+roqoqo-derive 1.13.0
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for the roqoqo crate
 License: Apache-2.0
@@ -36537,7 +36537,7 @@ You may use this code under the terms of either license.
 
 
 ====================================================
-schemars 0.8.20
+schemars 0.8.21
 https://graham.cool/schemars/
 by Graham Esau <gesau@hotmail.co.uk>
 Generate JSON Schemas from Rust code
@@ -36569,7 +36569,7 @@ SOFTWARE.
 
 
 ====================================================
-schemars_derive 0.8.20
+schemars_derive 0.8.21
 https://graham.cool/schemars/
 by Graham Esau <gesau@hotmail.co.uk>
 Macros for #[derive(JsonSchema)], for use with schemars
@@ -36847,7 +36847,7 @@ limitations under the License.
 
 
 ====================================================
-serde 1.0.202
+serde 1.0.203
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A generic serialization/deserialization framework
@@ -37061,7 +37061,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-serde_derive 1.0.202
+serde_derive 1.0.203
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 Macros 1.1 implementation of #[derive(Serialize, Deserialize)]
@@ -40499,7 +40499,7 @@ limitations under the License.
 
 
 ====================================================
-syn 2.0.65
+syn 2.0.66
 https://github.com/dtolnay/syn
 by David Tolnay <dtolnay@gmail.com>
 Parser for Rust source code
@@ -53881,7 +53881,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ====================================================
-wide 0.7.20
+wide 0.7.21
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.
@@ -57158,7 +57158,7 @@ by Manish Goregaokar <manishsmail@gmail.com>
 Custom derive for the zerofrom crate
 
 ====================================================
-zeroize 1.7.0
+zeroize 1.8.1
 https://github.com/RustCrypto/utils/tree/master/zeroize
 by The RustCrypto Project Developers
 Securely clear secrets from memory with a simple trait built on

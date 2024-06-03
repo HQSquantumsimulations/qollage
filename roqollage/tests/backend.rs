@@ -12,6 +12,8 @@
 //
 //! Testing the roqollage backend
 
+use std::f32::consts::PI;
+
 use qoqo_calculator::CalculatorFloat;
 use roqollage::{
     circuit_into_typst_str, circuit_to_image, InitializationMode, RenderPragmas, TypstBackend,
@@ -187,6 +189,39 @@ fn test_resonator() {
         Some(InitializationMode::State),
     )
     .unwrap();
+}
+
+#[test]
+fn test_values() {
+    let mut circuit = Circuit::new();
+    circuit.add_operation(RotateY::new(
+        0,
+        CalculatorFloat::Float((3.0 * PI / 2.0).into()),
+    ));
+    circuit.add_operation(RotateY::new(
+        0,
+        CalculatorFloat::Float((-3.0 * PI / 2.0).into()),
+    ));
+    circuit.add_operation(RotateY::new(1, CalculatorFloat::Float((PI / 3.0).into())));
+    circuit.add_operation(RotateY::new(1, CalculatorFloat::Float((-PI / 3.0).into())));
+    circuit.add_operation(RotateY::new(
+        2,
+        CalculatorFloat::Float((2.0 * PI / 3.0).into()),
+    ));
+    circuit.add_operation(RotateY::new(
+        2,
+        CalculatorFloat::Float((-2.0 * PI / 3.0).into()),
+    ));
+    circuit.add_operation(RotateY::new(
+        3,
+        CalculatorFloat::Float((3.0 * PI / 4.0).into()),
+    ));
+    circuit.add_operation(RotateY::new(
+        3,
+        CalculatorFloat::Float((-3.0 * PI / 4.0).into()),
+    ));
+
+    circuit_into_typst_str(&circuit, RenderPragmas::None, None).unwrap();
 }
 
 #[test]

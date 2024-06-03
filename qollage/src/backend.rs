@@ -55,7 +55,11 @@ pub fn save_circuit(
     let image = circuit_to_image(
         &circuit,
         Some(pixel_per_point),
-        RenderPragmas::from_str(render_pragmas).unwrap(),
+        RenderPragmas::from_str(render_pragmas).map_err(|x| {
+            PyValueError::new_err(format!(
+                "Error: render_pragmas is not in a suitable format: {x:?}"
+            ))
+        })?,
         initialization_mode,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;

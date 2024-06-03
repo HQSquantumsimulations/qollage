@@ -199,8 +199,16 @@ fn format_calculator(calculator: &CalculatorFloat) -> String {
             v if (v + std::f64::consts::PI).abs() < EPSILON => "-pi".to_owned(),
             v if (v - std::f64::consts::FRAC_PI_2).abs() < EPSILON => "pi/2".to_owned(),
             v if (v + std::f64::consts::FRAC_PI_2).abs() < EPSILON => "-pi/2".to_owned(),
+            v if (v - 3.0 * std::f64::consts::FRAC_PI_2).abs() < EPSILON => "(3pi)/2".to_owned(),
+            v if (v + 3.0 * std::f64::consts::FRAC_PI_2).abs() < EPSILON => "-(3pi)/2".to_owned(),
+            v if (v - std::f64::consts::FRAC_PI_3).abs() < EPSILON => "pi/3".to_owned(),
+            v if (v + std::f64::consts::FRAC_PI_3).abs() < EPSILON => "-pi/3".to_owned(),
+            v if (v - 2.0 * std::f64::consts::FRAC_PI_3).abs() < EPSILON => "(2pi)/3".to_owned(),
+            v if (v + 2.0 * std::f64::consts::FRAC_PI_3).abs() < EPSILON => "-(2pi)/3".to_owned(),
             v if (v - std::f64::consts::FRAC_PI_4).abs() < EPSILON => "pi/4".to_owned(),
             v if (v + std::f64::consts::FRAC_PI_4).abs() < EPSILON => "-pi/4".to_owned(),
+            v if (v - 3.0 * std::f64::consts::FRAC_PI_4).abs() < EPSILON => "(3pi)/4".to_owned(),
+            v if (v + 3.0 * std::f64::consts::FRAC_PI_4).abs() < EPSILON => "-(3pi)/4".to_owned(),
             v if (v - std::f64::consts::SQRT_2).abs() < EPSILON => "sqrt(2)".to_owned(),
             v if (v + std::f64::consts::SQRT_2).abs() < EPSILON => "-sqrt(2)".to_owned(),
             v if (v - std::f64::consts::FRAC_1_SQRT_2).abs() < EPSILON => "1/sqrt(2)".to_owned(),
@@ -279,39 +287,39 @@ fn format_qubit_input(qubit: usize, label: &str) -> String {
 /// * `circuit_gates` - A vector of all the gates vectors of the circuit.
 fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Vec<(usize, usize)>) {
     add_qubits_vec(circuit_gates, &[0]);
-    let last_slice = circuit_gates[0]
-        .iter()
-        .filter(|gate| gate.contains("slice") || gate.contains("gategroup"))
-        .last();
-    if effective_len(&circuit_gates[0]).eq(&circuit_gates
-        .iter()
-        .map(|gates: &Vec<String>| effective_len(gates.as_slice()))
-        .max()
-        .unwrap_or(0))
-        && last_slice.is_some()
-    {
-        let divider = circuit_gates[0].len()
-            - circuit_gates[0]
-                .iter()
-                .position(|gate| gate.eq(last_slice.unwrap()))
-                .unwrap();
-        for _ in 0..last_slice
-            .unwrap()
-            .split('\n')
-            .last()
-            .unwrap_or(".")
-            .chars()
-            .count()
-            / (10 * divider)
-            + 1
-        {
-            circuit_gates[0].push("1".to_owned());
-        }
-    }
     if circuit_gates[0].is_empty() {
         circuit_gates[0].push("1".to_owned());
         for qubit in 1..10 {
             circuit_lock.push((qubit, 0))
+        }
+    } else {
+        let last_slice = circuit_gates[0]
+            .iter()
+            .filter(|gate| gate.contains("slice") || gate.contains("gategroup"))
+            .last();
+        if let Some(last_slice) = last_slice {
+            let dist_to_max = circuit_gates
+                .iter()
+                .map(|gates: &Vec<String>| effective_len(gates))
+                .max()
+                .unwrap_or(0)
+                - effective_len(&circuit_gates[0]);
+            let len_to_add = match circuit_gates[0]
+                .iter()
+                .rev()
+                .position(|gate| gate.eq(last_slice))
+                .unwrap()
+                + dist_to_max
+            {
+                0 => 5,
+                1 => 3,
+                2 => 1,
+                _ => 0,
+            };
+
+            for _ in 0..(len_to_add + dist_to_max) {
+                circuit_gates[0].push("1".to_owned());
+            }
         }
     }
 }
@@ -539,7 +547,7 @@ pub fn add_gate(
             let n_qubits = circuit_gates.len();
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
-                "slice(label: $ \"Measurements\nn={}\" $)",
+                "slice(label: $ \"Measurements\"\\ \"n={}\" $)",
                 op.number_measurements(),
             ));
             Ok(())
@@ -569,7 +577,7 @@ pub fn add_gate(
             let n_qubits = circuit_gates.len();
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
-                r#"slice(label: $ "RepeatNextGate\n{} times" $, stroke: (paint: black, thickness: 1pt, dash: "densely-dash-dotted"))"#,
+                r#"slice(label: $ "RepeatNextGate"\ {}" times" $, stroke: (paint: black, thickness: 1pt, dash: "densely-dash-dotted"))"#,
                 op.repetition_coefficient(),
             ));
             Ok(())
@@ -670,7 +678,7 @@ pub fn add_gate(
             let n_qubits = circuit_gates.len();
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
-                r#"slice(label: $ "GlobalPhase"\ p={} $)"#,
+                r#"slice(label: $ "GlobalPhase"\ {} $)"#,
                 format_calculator(op.phase()),
             ));
             Ok(())

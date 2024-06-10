@@ -4821,7 +4821,7 @@ THE SOFTWARE.
 
 
 ====================================================
-cc 1.0.98
+cc 1.0.99
 https://github.com/rust-lang/cc-rs
 by Alex Crichton <alex@alexcrichton.com>
 A build-time dependency for Cargo build scripts to assist in invoking the native
@@ -33318,7 +33318,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-regex 1.10.4
+regex 1.10.5
 https://github.com/rust-lang/regex
 by The Rust Project Developers, Andrew Gallant <jamslam@gmail.com>
 An implementation of regular expressions for Rust. This implementation uses
@@ -33561,7 +33561,7 @@ limitations under the License.
 
 
 ====================================================
-regex-automata 0.4.6
+regex-automata 0.4.7
 https://github.com/rust-lang/regex/tree/master/regex-automata
 by The Rust Project Developers, Andrew Gallant <jamslam@gmail.com>
 Automata construction and matching using regular expressions.
@@ -33802,7 +33802,7 @@ limitations under the License.
 
 
 ====================================================
-regex-syntax 0.8.3
+regex-syntax 0.8.4
 https://github.com/rust-lang/regex/tree/master/regex-syntax
 by The Rust Project Developers, Andrew Gallant <jamslam@gmail.com>
 A regular expression parser.
@@ -40188,7 +40188,7 @@ SOFTWARE.
 
 
 ====================================================
-strum_macros 0.26.3
+strum_macros 0.26.4
 https://github.com/Peternator7/strum
 by Peter Glotfelty <peter.glotfelty@microsoft.com>
 Helpful macros for working with enums and strings
@@ -41665,7 +41665,7 @@ limitations under the License.
 
 
 ====================================================
-tar 0.4.40
+tar 0.4.41
 https://github.com/alexcrichton/tar-rs
 by Alex Crichton <alex@alexcrichton.com>
 A Rust implementation of a TAR file reader and writer. This library does not
@@ -41673,7 +41673,7 @@ currently handle compression, but it is abstract over all I/O readers and
 writers. Additionally, great lengths are taken to ensure that the entire
 contents are never required to be entirely resident in memory all at once.
 
-License: MIT/Apache-2.0
+License: MIT OR Apache-2.0
 ----------------------------------------------------
 LICENSE-MIT:
 
@@ -44045,7 +44045,7 @@ freely, subject to the following restrictions:
 
 
 ====================================================
-toml 0.8.13
+toml 0.8.14
 https://github.com/toml-rs/toml
 by Alex Crichton <alex@alexcrichton.com>
 A native Rust encoder and decoder of TOML-formatted files and streams. Provides
@@ -44520,7 +44520,7 @@ LICENSE-APACHE:
 
 
 ====================================================
-toml_edit 0.22.13
+toml_edit 0.22.14
 https://github.com/toml-rs/toml
 by Andronik Ordian <write@reusable.software>, Ed Page <eopage@gmail.com>
 Yet another format-preserving TOML parser.
@@ -54326,7 +54326,7 @@ Software.
 
 
 ====================================================
-webpki-roots 0.26.1
+webpki-roots 0.26.2
 https://github.com/rustls/webpki-roots
 by 
 Mozilla's CA root certificates for use with webpki
@@ -54595,7 +54595,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ====================================================
-wide 0.7.21
+wide 0.7.24
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.
@@ -57303,7 +57303,7 @@ license-mit:
 
 
 ====================================================
-winnow 0.6.9
+winnow 0.6.13
 https://github.com/winnow-rs/winnow
 by 
 A byte-oriented, zero-copy, parser combinators library

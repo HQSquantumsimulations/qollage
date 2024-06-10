@@ -33,6 +33,5 @@ fn qollage(_py: Python, module: &Bound<PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(draw_circuit, module)?)?;
     module.add_function(wrap_pyfunction!(save_circuit, module)?)?;
     module.add_function(wrap_pyfunction!(circuit_to_typst_str, module)?)?;
-    module.add_function(wrap_pyfunction!(remove_two_qubit_gates_identities, module)?)?;
     Ok(())
 }

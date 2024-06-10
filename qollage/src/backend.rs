@@ -10,18 +10,14 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{collections::HashMap, io::Cursor, path::PathBuf, str::FromStr};
+use std::{io::Cursor, path::PathBuf, str::FromStr};
 
 use pyo3::{
     exceptions::{PyTypeError, PyValueError},
     prelude::*,
 };
-use qoqo::{convert_into_circuit, CircuitWrapper};
+use qoqo::convert_into_circuit;
 use roqollage::{circuit_into_typst_str, circuit_to_image, InitializationMode, RenderPragmas};
-use roqoqo::{
-    operations::{InvolveQubits, Operate, OperateTwoQubit, Operation},
-    RoqoqoError,
-};
 
 /// Saves the qoqo circuit as a png image
 ///
@@ -196,95 +192,4 @@ pub fn circuit_to_typst_str(
         initialization_mode,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))
-}
-
-/// Displays the qoqo circuit as an image output
-///
-/// Args:
-///     circuit (Circuit): The qoqo circuit to draw
-///     render_pragmas (bool): How to render Pragmas operations:  
-///        `"all"` to render every pragmas.
-///        `"none"` to not render any pragmas.
-///        `"PragmaOperation1, PragmaOperation2"` to render only some pragmas.  
-///     initialization_mode (String): What to display at the begginning of the circuit. "state" for "|0>" and  
-///         "qubit" for "q[n]" State will be used if the parameter is not set.
-///
-/// Raises:
-///     TypeError: Circuit conversion error
-///     ValueError: Operation not supported
-#[pyfunction]
-#[pyo3(signature = (circuit))]
-pub fn remove_two_qubit_gates_identities(circuit: &Bound<PyAny>) -> PyResult<qoqo::CircuitWrapper> {
-    let circuit = convert_into_circuit(circuit).map_err(|x| {
-        PyTypeError::new_err(format!("Cannot convert python object to Circuit: {x:?}"))
-    })?;
-    Ok(CircuitWrapper {
-        internal: remove_identities(circuit).map_err(|e| PyValueError::new_err(e.to_string()))?,
-    })
-}
-
-fn remove_identities(circuit: roqoqo::Circuit) -> Result<roqoqo::Circuit, RoqoqoError> {
-    const UNITARY_GATES: &[&str] = &["CNOT", "SWAP", "iSWAP", "ControlledPauliZ"];
-    let mut last_gates: HashMap<(usize, usize), Option<(String, Operation)>> =
-        std::collections::HashMap::new();
-    let mut new_circuit = roqoqo::Circuit::new();
-    for op in circuit.iter() {
-        if op.tags().contains(&"TwoQubitGateOperation")
-            && UNITARY_GATES.contains(op.tags().last().unwrap_or(&""))
-        {
-            let qubits = match op {
-                Operation::CNOT(cnot) => (*cnot.control(), *cnot.target()),
-                Operation::SWAP(swap) => (*swap.control(), *swap.target()),
-                Operation::ISwap(iswap) => (*iswap.control(), *iswap.target()),
-                Operation::ControlledPauliZ(cpz) => (*cpz.control(), *cpz.target()),
-                _ => {
-                    return Err(RoqoqoError::GenericError {
-                        msg: "Invalid operation.".to_owned(),
-                    })
-                }
-            };
-            match last_gates.get(&qubits) {
-                Some(Some((name, _))) if name == op.hqslang() => {
-                    last_gates.insert(qubits, None);
-                }
-                _ => {
-                    for (key, _val) in last_gates.clone().iter() {
-                        for qubit in [qubits.0, qubits.1].iter() {
-                            if [key.0, key.1].contains(qubit) {
-                                if let Some(Some((_name, operation))) = last_gates.get(key) {
-                                    new_circuit.add_operation(operation.clone());
-                                }
-                                last_gates.insert(*key, None);
-                            }
-                        }
-                    }
-                    last_gates.insert(qubits, Some((op.hqslang().to_string(), op.clone())));
-                }
-            }
-        } else {
-            let qubits = match op.involved_qubits() {
-                roqoqo::operations::InvolvedQubits::Set(qubits) => qubits.iter().cloned().collect(),
-                _ => vec![],
-            };
-            for (key, _val) in last_gates.clone().iter() {
-                for qubit in qubits.iter() {
-                    if [key.0, key.1].contains(qubit) {
-                        if let Some(Some((_name, operation))) = last_gates.get(key) {
-                            new_circuit.add_operation(operation.clone());
-                        }
-                        last_gates.insert(*key, None);
-                    }
-                }
-            }
-            new_circuit.add_operation(op.clone())
-        }
-    }
-    for (_name, operation) in last_gates.values().flatten() {
-        new_circuit.add_operation(operation.clone());
-    }
-    if new_circuit.eq(&circuit) {
-        Ok(new_circuit)
-    } else {
-        remove_identities(new_circuit)
-    }
 }

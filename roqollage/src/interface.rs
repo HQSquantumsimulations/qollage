@@ -63,13 +63,6 @@ fn effective_len(gates: &[String]) -> usize {
 ///
 /// * `circuit_gates` - A vector of all the gates vectors of the circuit.
 /// * `qubits` - A vector of the qubits to flatten.
-///
-/// # Example:
-/// ````
-/// let circuit_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
-/// flatten_qubits(&mut circuit_gates, vec![0, 2]);
-///
-/// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
 fn flatten_qubits(circuit_gates: &mut [Vec<String>], qubits: &[usize]) {
     let max_len = qubits
         .iter()
@@ -111,15 +104,6 @@ fn push_ones(circuit_gates: &mut [Vec<String>], min: usize, max: usize) {
 /// * `gate_vec_2` - A second vector of gates vectors of the circuit.
 /// * `vec_1_ind` - A vector of the indexes to flatten.
 /// * `vec_2_ind` - A vector of the indexes to flatten.
-///
-/// # Example:
-/// ````
-/// let circuit_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
-/// let bosonic_gates = vec![vec!["$H$", "1"], vec!["$X$"], vec![]];
-/// flatten_multiple_vec(&mut circuit_gates, &mut bosonic_gates, vec![0, 2], vec![1]);
-///
-/// assert_eq!(circuit_gates, vec![vec!["$H$", "1"], vec!["$H$"], vec!["1", "1"]]);
-/// assert_eq!(bosonic_gates, vec![vec!["$H$", "1"], vec!["$H$", "1"], vec![]]);
 pub(crate) fn flatten_multiple_vec(
     gate_vec_1: &mut [Vec<String>],
     gate_vec_2: &mut [Vec<String>],

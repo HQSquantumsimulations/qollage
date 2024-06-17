@@ -161,7 +161,7 @@ jobs:
           target: x86_64-unknown-linux-gnu
           default: true
       - run: |
-          cargo test --doc --package=${{inputs.rust_package_name}}
+          cargo test --doc --package=roqollage
 
   code_coverage_roqoqo:
     runs-on: ubuntu-latest
@@ -177,7 +177,7 @@ jobs:
       - uses: taiki-e/install-action@cargo-llvm-cov
       - run: |
 
-          cd ${{inputs.rust_package_name}}
+          cd roqollage
           cargo llvm-cov --no-default-features --lcov --output-path lcov_roqoqo.info --fail-under-lines=90
 
   build_tests:

@@ -20,10 +20,11 @@ This repository uses the [Typst](https://github.com/typst/typst) typesetting sys
 
 Drawing tool for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
 
-Qollage provides the save_circuit and draw_circuit functions that allows users to translate a qoqo circuit into a png image and either save it or display it.
+Qollage provides the save_circuit and draw_circuit functions that allows users to translate a qoqo circuit into a png image and either save it or display it.  
+These two functions will create a cache folder named `.qollage` containing fonts and Typst libraries in the current directory. You are free to delete it but the files will be downloaded again at the next use.  
 It also provides the circuit_to_typst_str that can be used to generate a string that can be copy pasted in the Typst interpreter if you want to edit the circuit further.  
 The latest qoqo gates might not be implemented in qollage yet.
-A circuit containing not supported operations can't be drawn.  
+A circuit containing not supported operations can't be drawn and will result in an error.  
 If a gate has a string parameter it will be printed inside a typst mathematical expression and the typst symbols will be replaced.  
 Alphanumerical expressions will be preprocessed, if it doesn't represent any typst symbol it will be escaped by surrounding quotes.  
 `qoqo.operations.RotateX(0, "theta")` will be formatted as `θ`.  

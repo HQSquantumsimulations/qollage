@@ -40,3 +40,4 @@ regex = "1.4"
 
 [dev-dependencies]
 test-case = "3.0"
+serial_test = "3.1"

@@ -19,9 +19,11 @@ use roqollage::{
     circuit_into_typst_str, circuit_to_image, InitializationMode, RenderPragmas, TypstBackend,
 };
 use roqoqo::{operations::*, Circuit};
+use serial_test::serial;
 use typst::eval::Tracer;
 
 #[test]
+#[serial]
 fn test_str() {
     let mut circuit = Circuit::new();
     circuit.add_operation(Hadamard::new(0));
@@ -55,6 +57,7 @@ fn test_str() {
 }
 
 #[test]
+#[serial]
 fn test_image() {
     let mut circuit = Circuit::new();
     let mut loop_circuit = Circuit::new();
@@ -114,6 +117,7 @@ fn test_image() {
 }
 
 #[test]
+#[serial]
 fn test_flatten() {
     let mut circuit = Circuit::new();
     circuit.add_operation(DefinitionBit::new("ro".to_owned(), 2, true));
@@ -136,6 +140,7 @@ fn test_flatten() {
 }
 
 #[test]
+#[serial]
 fn test_flatten_boson() {
     let mut circuit = Circuit::new();
     circuit.add_operation(DefinitionBit::new("ro".to_owned(), 2, true));
@@ -169,6 +174,7 @@ fn test_flatten_boson() {
 }
 
 #[test]
+#[serial]
 fn test_resonator() {
     let mut circuit = Circuit::new();
     circuit.add_operation(DefinitionBit::new("ro".to_owned(), 2, true));
@@ -192,6 +198,7 @@ fn test_resonator() {
 }
 
 #[test]
+#[serial]
 fn test_values() {
     let mut circuit = Circuit::new();
     circuit.add_operation(RotateY::new(
@@ -225,6 +232,7 @@ fn test_values() {
 }
 
 #[test]
+#[serial]
 fn test_backend_today() {
     let backend = TypstBackend::new("#datetime.today().display()".to_owned()).unwrap();
     let mut tracer = Tracer::default();

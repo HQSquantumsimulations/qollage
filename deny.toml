@@ -83,7 +83,8 @@ allow = [
     "BSD-2-Clause",
     "Unicode-DFS-2016",
     "Unicode-3.0",
-    "ISC"
+    "ISC",
+    "Zlib"
 ]
 # List of explicitly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
@@ -121,6 +122,12 @@ exceptions = [
     # Each entry is the crate and version constraint, and its specific allow
     # list
     #{ allow = ["Zlib"], name = "adler32", version = "*" },
+    { allow = ["MPL-2.0"], name = "resvg", version = "*" },
+    { allow = ["MPL-2.0"], name = "usvg", version = "*" },
+    { allow = ["MPL-2.0"], name = "usvg-parser", version = "*" },
+    { allow = ["MPL-2.0"], name = "usvg-text-layout", version = "*" },
+    { allow = ["MPL-2.0"], name = "usvg-tree", version = "*" },
+    { allow = ["MPL-2.0"], name = "webpki-roots", version = "*" },
 ]
 
 # Some crates don't have (easily) machine readable licensing information,
@@ -154,6 +161,13 @@ ignore = true
 # not have its license(s) checked
 registries = [
     #"https://sekretz.com/registry
+]
+
+[[licenses.clarify]]
+name = "ring"
+expression = "MIT AND ISC"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 }
 ]
 
 # This section is considered when running `cargo deny check bans`.

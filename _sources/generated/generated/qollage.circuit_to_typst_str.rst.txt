@@ -1,0 +1,6 @@
+qollage.circuit\_to\_typst\_str
+===============================
+
+.. currentmodule:: qollage
+
+.. autofunction:: circuit_to_typst_str

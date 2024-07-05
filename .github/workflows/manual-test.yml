@@ -26,7 +26,7 @@ jobs:
             maturin-version: latest
             command: build
             manylinux: 2014
-            args: --find-interpreter --out wheels -m qoqo_qasm/Cargo.toml --release --locked
+            args: --find-interpreter --out wheels -m qollage/Cargo.toml --release --locked
 
   build_maturin_builds_linux_arm:
     name: maturin_build-linux-arm
@@ -51,7 +51,7 @@ jobs:
             command: build
             manylinux: 2014
             target: aarch64-unknown-linux-gnu
-            args: --find-interpreter --out wheels -m qoqo_qasm/Cargo.toml --release --locked
+            args: --find-interpreter --out wheels -m qollage/Cargo.toml --release --locked
 
   build_maturin_src_builds_linux:
     name: maturin_build-src
@@ -72,4 +72,4 @@ jobs:
           with:
             maturin-version: latest
             command: sdist
-            args: --out wheels -m qoqo_qasm/Cargo.toml
+            args: --out wheels -m qollage/Cargo.toml

@@ -1,6 +1,6 @@
 [package]
 name = "qollage"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -20,7 +20,10 @@ doctest = false
 
 [dependencies]
 qoqo = { version = "~1.15", default-features = false }
-roqoqo = { version = "~1.15", features = ["serialize"] }
+roqoqo = { version = "~1.15", features = [
+    "serialize",
+    "unstable_operation_definition",
+] }
 roqollage = { version = "~0.2", path = "../roqollage" }
 image = "0.25"
 

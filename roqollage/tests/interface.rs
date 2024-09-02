@@ -40,8 +40,8 @@ use test_case::test_case;
 #[test_case(Operation::from(FSwap::new(0, 1)); "FSwap")]
 #[test_case(Operation::from(MeasureQubit::new(0,"ro".to_owned(), 0)); "MeasureQubit")]
 #[test_case(Operation::from(Toffoli::new(0, 1, 2)); "Toffoli")]
-// #[test_case(Operation::from(GateDefinition::new(vec![Operation::from(RotateX::new(0, CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1, CalculatorFloat::PI))].into_iter().collect(), "test_gate".to_owned(), vec![0, 1], vec!["theta".to_owned()])); "GateDefinition")]
-// #[test_case(Operation::from(CallDefinedGate::new("test".to_owned(), vec![0, 1], vec![CalculatorFloat::from("3.14")])); "CallDefinedGate")]
+#[test_case(Operation::from(GateDefinition::new(vec![Operation::from(RotateX::new(0, CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1, CalculatorFloat::PI))].into_iter().collect(), "test_gate".to_owned(), vec![0, 1], vec!["theta".to_owned()])); "GateDefinition")]
+#[test_case(Operation::from(CallDefinedGate::new("test".to_owned(), vec![0, 1], vec![CalculatorFloat::from("3.14")])); "CallDefinedGate")]
 #[test_case(Operation::from(PragmaConditional::new("q".to_owned(), 0, Circuit::new())); "PragmaConditionalEmpty")]
 #[test_case(Operation::from(PragmaConditional::new("q".to_owned(), 0, [Operation::from(RotateX::new(0,CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1,CalculatorFloat::from("pi")))].into_iter().collect())); "PragmaConditional")]
 #[test_case(Operation::from(PragmaLoop::new(CalculatorFloat::Float(5.2), vec![Operation::from(RotateX::new(0, CalculatorFloat::from("theta"))), Operation::from(RotateX::new(1, CalculatorFloat::PI))].into_iter().collect())); "PragmaLoop")]
@@ -108,7 +108,6 @@ use test_case::test_case;
 #[test_case(Operation::from(PragmaGetOccupationProbability::new("ro".into(), None)); "PragmaGetOccupationProbability")]
 #[test_case(Operation::from(InputBit::new(String::from("test"), 1, false)); "InputBit")]
 #[test_case(Operation::from(PhaseShiftState0::new(0, CalculatorFloat::PI)); "PhaseShiftState0")]
-// #[test_case(Operation::from(); "")]
 #[test_case(Operation::from(PhotonDetection::new(0, "ro".to_owned(), 0)); "PhotonDetection")]
 #[test_case(Operation::from(PragmaGetDensityMatrix::new("ro".to_owned(), None)); "PragmaGetDensityMatrix")]
 #[test_case(Operation::from(PragmaChangeDevice::new(&Operation::from(PragmaOverrotation::new("RotateX".to_owned(), vec![0,1], 0.1, 0.1))).unwrap()); "PragmaChangeDevice")]
@@ -155,9 +154,9 @@ fn test_add_gate(operation: Operation) {
 #[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([(4, 4)]), "ro".into(), Circuit::new(),)); "PragmaGetPauliProduct")]
 #[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([]), "ro".into(), Circuit::new(),)); "PragmaGetPauliProduct2")]
 #[test_case(Operation::from(PragmaAnnotatedOp::new(InputBit::new("ro".to_owned(), 0, true).into(), "test".to_string())); "PragmaAnnotatedOp")]
-// #[test_case(Operation::from(CallDefinedGate::new("test".to_owned(), vec![], vec![CalculatorFloat::from("3.14")])); "CallDefinedGate")]
+#[test_case(Operation::from(CallDefinedGate::new("test".to_owned(), vec![], vec![CalculatorFloat::from("3.14")])); "CallDefinedGate")]
 #[test_case(Operation::from(PragmaControlledCircuit::new(10, vec![Operation::from(InputBit::new("ro".to_owned(), 0, true))].into_iter().collect())); "PragmaControlledCircuit")]
-// #[test_case(Operation::from(GateDefinition::new(vec![Operation::from(InputBit::new("ro".to_owned(), 0, true))].into_iter().collect(), "test_gate".to_owned(), vec![0, 1], vec!["theta".to_owned()])); "GateDefinition")]
+#[test_case(Operation::from(GateDefinition::new(vec![Operation::from(InputBit::new("ro".to_owned(), 0, true))].into_iter().collect(), "test_gate".to_owned(), vec![0, 1], vec!["theta".to_owned()])); "GateDefinition")]
 
 fn test_add_gate_errors(operation: Operation) {
     let mut circuit_gates: Vec<Vec<String>> = Vec::new();

@@ -63,14 +63,6 @@ pub fn save_circuit(
         initialization_mode,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
-    let mut buffer = Cursor::new(Vec::new());
-    image
-        .write_to(&mut buffer, image::ImageFormat::Png)
-        .map_err(|x| {
-            PyValueError::new_err(format!(
-                "Error during the generation of the Png file: {x:?}"
-            ))
-        })?;
 
     let path = match path {
         Some(path) => {

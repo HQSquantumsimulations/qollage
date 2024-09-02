@@ -286,10 +286,17 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
         if let Some(last_slice) = last_slice {
             let dist_to_max = circuit_gates
                 .iter()
-                .map(|gates: &Vec<String>| effective_len(gates))
+                .map(|gates: &Vec<String>| effective_len(gates) + 1)
                 .max()
                 .unwrap_or(0)
-                - effective_len(&circuit_gates[0]);
+                - effective_len(&circuit_gates[0])
+                + last_slice
+                    .contains("gategroup")
+                    .then(|| last_slice.split(",").nth(1).unwrap_or_default())
+                    .unwrap_or_default()
+                    .trim()
+                    .parse::<usize>()
+                    .unwrap_or_default();
             let len_to_add = match circuit_gates[0]
                 .iter()
                 .rev()

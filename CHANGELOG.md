@@ -5,6 +5,7 @@ This changelog track changes to the qollage project starting at version v0.1.0
 ## 0.2.2
 
 * Fixed a bug where a gate that has an optional circuit would sometimes fail to be renered (e.g. PragmaGetStateVector)
+* Improved spacing to avoid text overlap.
 
 ## 0.2.1
 

@@ -119,7 +119,8 @@ use test_case::test_case;
 #[test_case(Operation::from(PragmaGetStateVector::new("ro".to_owned(), None)); "PragmaGetStateVector")]
 #[test_case(Operation::from(PragmaSetStateVector::new(array![Complex64::new(0.0, 0.0),Complex64::new(1.0 / (2.0_f64).sqrt(), 0.0),Complex64::new(-1.0 / (2.0_f64).sqrt(), 0.0),Complex64::new(0.0, 0.0) ])); "PragmaSetStateVector")]
 #[test_case(Operation::from(PragmaSetDensityMatrix::new(array![[Complex64::new(1.0, 0.0), Complex64::new(0.0, 0.0)],[Complex64::new(0.0, 0.0), Complex64::new(0.0, 0.0)],])); "PragmaSetDensityMatrix")]
-
+#[test_case(Operation::from(InvSqrtPauliY::new(0)); "InvSqrtPauliY")]
+#[test_case(Operation::from(SqrtPauliY::new(0)); "SqrtPauliY")]
 fn test_add_gate(operation: Operation) {
     let mut circuit_gates: Vec<Vec<String>> = Vec::new();
     let mut bosonic_gates: Vec<Vec<String>> = Vec::new();

@@ -5076,7 +5076,7 @@ THE SOFTWARE.
 
 
 ====================================================
-cc 1.1.15
+cc 1.1.16
 https://github.com/rust-lang/cc-rs
 by Alex Crichton <alex@alexcrichton.com>
 A build-time dependency for Cargo build scripts to assist in invoking the native
@@ -30882,7 +30882,7 @@ This crate provides a very thin abstraction over other profiler crates.
 License: MIT OR Apache-2.0
 
 ====================================================
-psm 0.1.22
+psm 0.1.23
 https://github.com/rust-lang/stacker/
 by Simonas Kazlauskas <psm@kazlauskas.me>
 Portable Stack Manipulation: stack manipulation and introspection routines
@@ -32507,7 +32507,7 @@ limitations under the License.
 
 
 ====================================================
-qollage 0.2.2
+qollage 0.2.3
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Visualization tool for qoqo quantum computing toolkit by HQS Quantum Simulations
@@ -36987,7 +36987,7 @@ by Brian Smith <brian@briansmith.org>
 Safe, fast, small crypto using Rust.
 
 ====================================================
-roqollage 0.2.2
+roqollage 0.2.3
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Visualization tool for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations
@@ -41075,7 +41075,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-serde_json 1.0.127
+serde_json 1.0.128
 https://github.com/serde-rs/json
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A JSON serialization file format

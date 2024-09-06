@@ -4849,7 +4849,7 @@ limitations under the License.
 
 
 ====================================================
-bytemuck 1.17.1
+bytemuck 1.18.0
 https://github.com/Lokathor/bytemuck
 by Lokathor <zefria@gmail.com>
 A crate for mucking around with piles of bytes.
@@ -32507,7 +32507,7 @@ limitations under the License.
 
 
 ====================================================
-qollage 0.2.3
+qollage 0.3.0
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Visualization tool for qoqo quantum computing toolkit by HQS Quantum Simulations
@@ -36987,7 +36987,7 @@ by Brian Smith <brian@briansmith.org>
 Safe, fast, small crypto using Rust.
 
 ====================================================
-roqollage 0.2.3
+roqollage 0.3.0
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Visualization tool for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations
@@ -38098,7 +38098,7 @@ limitations under the License.
 
 
 ====================================================
-rustix 0.38.35
+rustix 0.38.36
 https://github.com/bytecodealliance/rustix
 by Dan Gohman <dev@sunfishcode.online>, Jakub Konka <kubkon@jakubkonka.com>
 Safe Rust bindings to POSIX/Unix/Linux/Winsock-like syscalls

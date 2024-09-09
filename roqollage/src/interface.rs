@@ -181,6 +181,7 @@ fn format_symbol_str(str_value: &str) -> String {
 fn format_calculator(calculator: &CalculatorFloat) -> String {
     match calculator {
         CalculatorFloat::Float(float_value) => match float_value {
+            0.0 => "0".to_owned(),
             v if (v - std::f64::consts::PI).abs() < EPSILON => "pi".to_owned(),
             v if (v + std::f64::consts::PI).abs() < EPSILON => "-pi".to_owned(),
             v if (v - std::f64::consts::FRAC_PI_2).abs() < EPSILON => "pi/2".to_owned(),
@@ -199,6 +200,7 @@ fn format_calculator(calculator: &CalculatorFloat) -> String {
             v if (v + std::f64::consts::SQRT_2).abs() < EPSILON => "-sqrt(2)".to_owned(),
             v if (v - std::f64::consts::FRAC_1_SQRT_2).abs() < EPSILON => "1/sqrt(2)".to_owned(),
             v if (v + std::f64::consts::FRAC_1_SQRT_2).abs() < EPSILON => "-1/sqrt(2)".to_owned(),
+            v if v.abs() <= 0.005 || v.abs() >= 1000. => format!("{:.2e}", v),
             _ => {
                 if float_value.fract() == 0.0 {
                     format!("{:.0}", float_value)

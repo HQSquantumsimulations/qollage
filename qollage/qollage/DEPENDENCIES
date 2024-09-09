@@ -608,7 +608,7 @@ SOFTWARE.
 
 
 ====================================================
-anyhow 1.0.86
+anyhow 1.0.87
 https://github.com/dtolnay/anyhow
 by David Tolnay <dtolnay@gmail.com>
 Flexible concrete Error type built on std::error::Error
@@ -5076,7 +5076,7 @@ THE SOFTWARE.
 
 
 ====================================================
-cc 1.1.16
+cc 1.1.18
 https://github.com/rust-lang/cc-rs
 by Alex Crichton <alex@alexcrichton.com>
 A build-time dependency for Cargo build scripts to assist in invoking the native
@@ -39721,7 +39721,7 @@ You may use this code under the terms of either license.
 
 
 ====================================================
-scc 2.1.16
+scc 2.1.17
 https://github.com/wvwwvwwv/scalable-concurrent-containers/
 by wvwwvwwv <wvwwvwwv@me.com>
 High performance containers and utilities for concurrent and asynchronous programming
@@ -40232,7 +40232,7 @@ limitations under the License.
 
 
 ====================================================
-sdd 3.0.2
+sdd 3.0.3
 https://github.com/wvwwvwwv/scalable-delayed-dealloc/
 by wvwwvwwv <wvwwvwwv@me.com>
 Scalable lock-free delayed memory reclaimer
@@ -40433,7 +40433,7 @@ LICENSE:
 
 
 ====================================================
-serde 1.0.209
+serde 1.0.210
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A generic serialization/deserialization framework
@@ -40647,7 +40647,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-serde_derive 1.0.209
+serde_derive 1.0.210
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 Macros 1.1 implementation of #[derive(Serialize, Deserialize)]

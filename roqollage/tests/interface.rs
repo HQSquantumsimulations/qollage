@@ -143,10 +143,10 @@ fn test_add_gate(operation: Operation) {
 
 #[test_case(Operation::from(PragmaStartDecompositionBlock::new(vec![], HashMap::new())); "PragmaStartDecompositionBlock")]
 #[test_case(Operation::from(PragmaStopDecompositionBlock::new(vec![])); "PragmaStopDecompositionBlock")]
-#[test_case(Operation::from(PragmaOverrotation::new("RotateX".to_owned(), vec![], 0.1, 0.1)); "PragmaOverrotation")]
+#[test_case(Operation::from(PragmaOverrotation::new("RotateX".to_owned(), vec![], 0.0001, 9990.1)); "PragmaOverrotation")]
 #[test_case(Operation::from(PragmaStopParallelBlock::new(vec![], 0.5.into())); "PragmaStopParallelBlock")]
-#[test_case(Operation::from(PragmaSleep::new(vec![], 0.0.into())); "PragmaSleep")]
-#[test_case(Operation::from(MultiQubitMS::new(vec![], 0.0.into())); "MultiQubitMS")]
+#[test_case(Operation::from(PragmaSleep::new(vec![], 0.0012.into())); "PragmaSleep")]
+#[test_case(Operation::from(MultiQubitMS::new(vec![], 0.000321.into())); "MultiQubitMS")]
 #[test_case(Operation::from(MultiQubitZZ::new(vec![], 0.0.into())); "MultiQubitZZ")]
 #[test_case(Operation::from(PragmaGetDensityMatrix::new("ro".to_owned(), Some(Circuit::new()))); "PragmaGetDensityMatrix")]
 #[test_case(Operation::from(PragmaGetStateVector::new("ro".to_owned(), Some(Circuit::new()))); "PragmaGetStateVector")]

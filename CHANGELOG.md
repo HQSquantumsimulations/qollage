@@ -2,7 +2,7 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
-## 0.3.1
+## 0.4.0-alpha0
 
 * Use ureq's `native-certs` feature.
 

@@ -33231,7 +33231,7 @@ limitations under the License.
 
 
 ====================================================
-qollage 0.3.1
+qollage 0.4.0-alpha0
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Visualization tool for qoqo quantum computing toolkit by HQS Quantum Simulations
@@ -37711,7 +37711,7 @@ by Brian Smith <brian@briansmith.org>
 Safe, fast, small crypto using Rust.
 
 ====================================================
-roqollage 0.3.1
+roqollage 0.4.0-alpha0
 https://github.com/HQSquantumsimulations/qollage
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Visualization tool for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations

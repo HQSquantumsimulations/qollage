@@ -1,6 +1,6 @@
 [package]
 name = "roqollage"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -34,7 +34,7 @@ time = "0.3"
 bytemuck = "1"
 ndarray = "0.15"
 num-complex = "0.4"
-ureq = "2.9"
+ureq = { version = "2.10", features = ["native-certs"] }
 zune-inflate = "0.2"
 tar = "0.4"
 regex = "1.4"

@@ -2,6 +2,10 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
+## 0.3.1
+
+* Use ureq's `native-certs` feature.
+
 ## 0.3.0
 
 * Changed the number formatting to not display `0.00` if the number is < 0.01

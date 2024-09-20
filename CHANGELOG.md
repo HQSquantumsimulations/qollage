@@ -4,7 +4,7 @@ This changelog track changes to the qollage project starting at version v0.1.0
 
 ## 0.4.0-alpha0
 
-* Use ureq's `native-certs` feature.
+* Use ureq's `native-certs` feature to use the OS's TLS trust store.
 
 ## 0.3.0
 

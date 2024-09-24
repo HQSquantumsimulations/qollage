@@ -1,6 +1,6 @@
 [package]
 name = "qollage"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -20,11 +20,8 @@ doctest = false
 
 [dependencies]
 qoqo = { version = "~1.15", default-features = false }
-roqoqo = { version = "~1.15", features = [
-    "serialize",
-    "unstable_operation_definition",
-] }
-roqollage = { version = "~0.3", path = "../roqollage" }
+roqoqo = { version = "~1.15", features = ["serialize"] }
+roqollage = { version = "~0.4.0", path = "../roqollage" }
 image = "0.25"
 
 [dependencies.pyo3]
@@ -44,3 +41,7 @@ pyo3 = "0.21"
 [features]
 extension-module = ["pyo3/extension-module"]
 default = ["extension-module"]
+unstable_operation_definition = [
+    "roqoqo/unstable_operation_definition",
+    "roqollage/unstable_operation_definition",
+]

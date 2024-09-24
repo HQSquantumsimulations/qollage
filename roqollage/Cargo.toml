@@ -1,6 +1,6 @@
 [package]
 name = "roqollage"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -19,10 +19,7 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-roqoqo = { version = "~1.15", features = [
-    "serialize",
-    "unstable_operation_definition",
-] }
+roqoqo = { version = "~1.15", features = ["serialize"] }
 qoqo_calculator = { version = "~1.2" }
 
 typst = "0.11"
@@ -42,3 +39,6 @@ regex = "1.4"
 [dev-dependencies]
 test-case = "3.0"
 serial_test = "3.1"
+
+[features]
+unstable_operation_definition = ["roqoqo/unstable_operation_definition"]

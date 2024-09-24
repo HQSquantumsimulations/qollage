@@ -2,6 +2,12 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
+## 0.4.0
+
+* Fixed an issue where qollage wouldn't be able to convert some circuits.
+* Added the `max_circuit_length` parameter to define the maximum circuit length on the image.
+* Fixed a bug where control wires would sometimes overlap with gates.
+
 ## 0.3.0
 
 * Changed the number formatting to not display `0.00` if the number is < 0.01

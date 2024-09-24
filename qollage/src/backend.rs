@@ -32,18 +32,21 @@ use roqollage::{circuit_into_typst_str, circuit_to_image, InitializationMode, Re
 ///        `"PragmaOperation1, PragmaOperation2"` to render only some pragmas.  
 ///     initialization_mode (String): What to display at the begginning of the circuit. "state" for "|0>" and  
 ///         "qubit" for "q[n]" State will be used if the parameter is not set.
+///     max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
+///         The default setting `None` does not create a new line.
 ///
 /// Raises:
 ///     TypeError: Circuit conversion error
 ///     ValueError: Operation not supported
 #[pyfunction]
-#[pyo3(signature = (circuit, path=None, pixel_per_point=3.0, render_pragmas="all", initialization_mode=None))]
+#[pyo3(signature = (circuit, path=None, pixel_per_point=3.0, render_pragmas="all", initialization_mode=None, max_circuit_length=None))]
 pub fn save_circuit(
     circuit: &Bound<PyAny>,
     path: Option<PathBuf>,
     pixel_per_point: f32,
     render_pragmas: &str,
     initialization_mode: Option<String>,
+    max_circuit_length: Option<usize>,
 ) -> PyResult<()> {
     let circuit = convert_into_circuit(circuit).map_err(|x| {
         PyTypeError::new_err(format!("Cannot convert python object to Circuit: {x:?}"))
@@ -61,6 +64,7 @@ pub fn save_circuit(
             ))
         })?,
         initialization_mode,
+        max_circuit_length,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
 
@@ -97,17 +101,20 @@ pub fn save_circuit(
 ///        `"PragmaOperation1, PragmaOperation2"` to render only some pragmas.  
 ///     initialization_mode (String): What to display at the begginning of the circuit. "state" for "|0>" and  
 ///         "qubit" for "q[n]" State will be used if the parameter is not set.
+///     max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
+///         The default setting `None` does not create a new line.
 ///
 /// Raises:
 ///     TypeError: Circuit conversion error
 ///     ValueError: Operation not supported
 #[pyfunction]
-#[pyo3(signature = (circuit, pixel_per_point=3.0, render_pragmas="All", initialization_mode=None))]
+#[pyo3(signature = (circuit, pixel_per_point=3.0, render_pragmas="All", initialization_mode=None, max_circuit_length=None))]
 pub fn draw_circuit(
     circuit: &Bound<PyAny>,
     pixel_per_point: f32,
     render_pragmas: &str,
     initialization_mode: Option<String>,
+    max_circuit_length: Option<usize>,
 ) -> PyResult<()> {
     let circuit = convert_into_circuit(circuit).map_err(|x| {
         PyTypeError::new_err(format!("Cannot convert python object to Circuit: {x:?}"))
@@ -121,6 +128,7 @@ pub fn draw_circuit(
         Some(pixel_per_point),
         RenderPragmas::from_str(render_pragmas).unwrap(),
         initialization_mode,
+        max_circuit_length,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))?;
     let mut buffer = Cursor::new(Vec::new());
@@ -159,16 +167,19 @@ pub fn draw_circuit(
 ///        `"PragmaOperation1, PragmaOperation2"` to render only some pragmas.  
 ///     initialization_mode (String): What to display at the begginning of the circuit. "state" for "|0>" and  
 ///         "qubit" for "q[n]" State will be used if the parameter is not set.
+///     max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
+///         The default setting `None` does not create a new line.
 ///
 /// Raises:
 ///     TypeError: Circuit conversion error
 ///     ValueError: Operation not supported
 #[pyfunction]
-#[pyo3(signature = (circuit, render_pragmas="All", initialization_mode=None))]
+#[pyo3(signature = (circuit, render_pragmas="All", initialization_mode=None, max_circuit_length=None))]
 pub fn circuit_to_typst_str(
     circuit: &Bound<PyAny>,
     render_pragmas: &str,
     initialization_mode: Option<String>,
+    max_circuit_length: Option<usize>,
 ) -> PyResult<String> {
     let circuit = convert_into_circuit(circuit).map_err(|x| {
         PyTypeError::new_err(format!("Cannot convert python object to Circuit: {x:?}"))
@@ -181,6 +192,7 @@ pub fn circuit_to_typst_str(
         &circuit,
         RenderPragmas::from_str(render_pragmas).unwrap(),
         initialization_mode,
+        max_circuit_length,
     )
     .map_err(|x| PyValueError::new_err(format!("Error during Circuit drawing: {x:?}")))
 }

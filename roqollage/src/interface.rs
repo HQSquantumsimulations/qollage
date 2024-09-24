@@ -44,7 +44,7 @@ fn add_qubits_vec(circuit_gates: &mut Vec<Vec<String>>, qubits: &[usize]) {
 /// # Returns
 ///
 /// * `usize` - The total length the gates will take on the image.
-fn effective_len(gates: &[String]) -> usize {
+pub(crate) fn effective_len(gates: &[String]) -> usize {
     gates.len()
         - gates
             .iter()
@@ -244,7 +244,7 @@ fn format_calculator(calculator: &CalculatorFloat) -> String {
                     value = value.strip_suffix(')').unwrap_or(value);
                 }
             }
-            let re = regex::Regex::new(r"[a-zA-Z][\w.]+").unwrap();
+            let re = regex::Regex::new(r"([a-zA-Z][\w.]+|-?[\d\.]+e-?\d)").unwrap();
             re.replace_all(value, |caps: &regex::Captures| format_symbol_str(&caps[0]))
                 .into()
         }
@@ -861,6 +861,7 @@ pub fn add_gate(
         Operation::SWAP(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
+            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
             let qubits: Vec<usize> = (min..max + 1).collect();
             add_qubits_vec(circuit_gates, &qubits);
             flatten_qubits(circuit_gates, &qubits);
@@ -871,6 +872,7 @@ pub fn add_gate(
         Operation::ISwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
+            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
             let qubits: Vec<usize> = (min..max + 1).collect();
             add_qubits_vec(circuit_gates, &qubits);
             flatten_qubits(circuit_gates, &qubits);
@@ -881,6 +883,7 @@ pub fn add_gate(
         Operation::FSwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
+            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
             let qubits: Vec<usize> = (min..max + 1).collect();
             add_qubits_vec(circuit_gates, &qubits);
             flatten_qubits(circuit_gates, &qubits);
@@ -891,6 +894,7 @@ pub fn add_gate(
         Operation::SqrtISwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
+            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
             let qubits: Vec<usize> = (min..max + 1).collect();
             add_qubits_vec(circuit_gates, &qubits);
             flatten_qubits(circuit_gates, &qubits);
@@ -901,6 +905,7 @@ pub fn add_gate(
         Operation::InvSqrtISwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
+            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
             let qubits: Vec<usize> = (min..max + 1).collect();
             add_qubits_vec(circuit_gates, &qubits);
             flatten_qubits(circuit_gates, &qubits);
@@ -914,6 +919,7 @@ pub fn add_gate(
         Operation::XY(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
+            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
             let qubits: Vec<usize> = (min..max + 1).collect();
             add_qubits_vec(circuit_gates, &qubits);
             flatten_qubits(circuit_gates, &qubits);
@@ -2003,6 +2009,7 @@ pub fn add_gate(
             ));
             Ok(())
         }
+        #[cfg(feature = "unstable_operation_definition")]
         Operation::CallDefinedGate(op) => {
             if op.qubits().is_empty() {
                 return Err(RoqoqoBackendError::GenericError {
@@ -2027,6 +2034,7 @@ pub fn add_gate(
             push_ones(circuit_gates, min, max);
             Ok(())
         }
+        #[cfg(feature = "unstable_operation_definition")]
         Operation::GateDefinition(op) => {
             if op.circuit().is_empty() {
                 return Ok(());

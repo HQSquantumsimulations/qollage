@@ -31,6 +31,7 @@ def draw_circuit(
     pixel_per_point: float = 3.0,
     render_pragmas: str = "all",
     initialization_mode: Optional[str] = None,
+    max_circuit_length: Optional[int] = None,
 ) -> None:
     """
     Displays the qoqo circuit as an image output
@@ -46,6 +47,8 @@ def draw_circuit(
          * initialization_mode (str, optional): What to display at the beginning of the circuit:\n
              - "state" for "|0>". Used if None. \n
              - "qubit" for "q[n]".\n
+         * max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
+             The default setting `None` does not create a new line.
 
     ## Raises:
          * TypeError: Circuit conversion error.
@@ -58,6 +61,7 @@ def save_circuit(
     pixel_per_point: float = 3.0,
     render_pragmas: str = "all",
     initialization_mode: Optional[str] = None,
+    max_circuit_length: Optional[int] = None,
 ) -> None:
     """
     Saves the qoqo circuit as a png image
@@ -74,6 +78,8 @@ def save_circuit(
          * initialization_mode (str, optional): What to display at the beginning of the circuit:\n
              - "state" for "|0>". Used if None. \n
              - "qubit" for "q[n]".\n
+         * max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
+             The default setting `None` does not create a new line.
 
     ## Raises:
          * TypeError: Circuit conversion error
@@ -84,6 +90,7 @@ def circuit_to_typst_str(
     circuit: Circuit,
     render_pragmas: str = "all",
     initialization_mode: Optional[str] = None,
+    max_circuit_length: Optional[int] = None,
 ) -> str:
     """
     Returns the circuit's representation in Typst.
@@ -99,6 +106,8 @@ def circuit_to_typst_str(
          * initialization_mode (str, optional): What to display at the beginning of the circuit:\n
              - "state" for "|0>". Used if None. \n
              - "qubit" for "q[n]".\n
+         * max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
+             The default setting `None` does not create a new line.
 
     ## Returns:
          * str: The circuit's representation in Typst.

@@ -47,11 +47,41 @@ fn test_str() {
     circuit.add_operation(SWAP::new(2, 1));
     circuit.add_operation(Toffoli::new(0, 1, 4));
 
-    circuit_into_typst_str(&circuit, RenderPragmas::None, None).unwrap();
+    circuit_into_typst_str(&circuit, RenderPragmas::None, None, None).unwrap();
     circuit_into_typst_str(
         &circuit,
         RenderPragmas::None,
         Some(InitializationMode::Qubit),
+        None,
+    )
+    .unwrap();
+}
+
+#[test]
+#[serial]
+fn test_max_len() {
+    let mut circuit = Circuit::new();
+    for _ in 0..51 {
+        circuit.add_operation(Hadamard::new(0));
+        circuit.add_operation(MeasureQubit::new(0, "ro".to_owned(), 0));
+        circuit.add_operation(BeamSplitter::new(
+            0,
+            1,
+            CalculatorFloat::ZERO,
+            CalculatorFloat::FRAC_PI_4,
+        ));
+    }
+    circuit.add_operation(DefinitionBit::new("ro".to_owned(), 2, true));
+    circuit.add_operation(CNOT::new(0, 1));
+    circuit.add_operation(SWAP::new(2, 1));
+    circuit.add_operation(Toffoli::new(0, 1, 4));
+
+    circuit_into_typst_str(&circuit, RenderPragmas::None, None, None).unwrap();
+    circuit_into_typst_str(
+        &circuit,
+        RenderPragmas::None,
+        Some(InitializationMode::Qubit),
+        Some(20),
     )
     .unwrap();
 }
@@ -105,6 +135,7 @@ fn test_image() {
         None,
         RenderPragmas::None,
         Some(InitializationMode::State),
+        None,
     )
     .unwrap();
     circuit_to_image(
@@ -112,6 +143,7 @@ fn test_image() {
         None,
         RenderPragmas::None,
         Some(InitializationMode::Qubit),
+        None,
     )
     .unwrap();
 }
@@ -135,6 +167,7 @@ fn test_flatten() {
         None,
         RenderPragmas::None,
         Some(InitializationMode::State),
+        None,
     )
     .unwrap();
 }
@@ -169,6 +202,7 @@ fn test_flatten_boson() {
         None,
         RenderPragmas::None,
         Some(InitializationMode::State),
+        None,
     )
     .unwrap();
 }
@@ -193,6 +227,7 @@ fn test_resonator() {
         None,
         RenderPragmas::None,
         Some(InitializationMode::State),
+        None,
     )
     .unwrap();
 }
@@ -228,7 +263,7 @@ fn test_values() {
         CalculatorFloat::Float((-3.0 * PI / 4.0).into()),
     ));
 
-    circuit_into_typst_str(&circuit, RenderPragmas::None, None).unwrap();
+    circuit_into_typst_str(&circuit, RenderPragmas::None, None, None).unwrap();
 }
 
 #[test]

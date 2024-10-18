@@ -1,10 +1,10 @@
 [package]
 name = "qollage"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.70"
 categories = ["science", "simulation"]
 readme = "README.md"
 repository = "https://github.com/HQSquantumsimulations/qollage"
@@ -19,9 +19,9 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qoqo = { version = "~1.15", default-features = false }
-roqoqo = { version = "~1.15", features = ["serialize"] }
-roqollage = { version = "~0.4.0", path = "../roqollage" }
+qoqo = { version = "~1.16", default-features = false }
+roqoqo = { version = "~1.16", features = ["serialize"] }
+roqollage = { version = "~0.4", path = "../roqollage" }
 image = "0.25"
 
 [dependencies.pyo3]

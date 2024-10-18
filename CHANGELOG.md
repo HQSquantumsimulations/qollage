@@ -2,6 +2,12 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
+## 0.4.1
+
+* Updated MSRV to 1.70
+* Updated to qoqo 1.16
+* Updated to maturin >=1.0,<2.0
+
 ## 0.4.0
 
 * Fixed an issue where qollage wouldn't be able to convert some circuits.

@@ -176,8 +176,8 @@ jobs:
           override: true
       - uses: taiki-e/install-action@cargo-llvm-cov
       - run: |
-
-          cd roqollage
+          python -m pip install numpy pillow ipython
+          rm -rf roqollage/.qollage qollage/.qollage
           cargo llvm-cov --no-default-features --lcov --output-path lcov_roqoqo.info --fail-under-lines=90
 
   build_tests:

@@ -113,6 +113,7 @@ fn test_image() {
     circuit.add_operation(Toffoli::new(0, 1, 4));
     circuit.add_operation(PragmaLoop::new(CalculatorFloat::from("4.0"), loop_circuit));
     circuit.add_operation(InputSymbolic::new("theta".to_owned(), 0.23));
+    circuit.add_operation(InputSymbolic::new("phi".to_owned(), 0.23));
     circuit.add_operation(RotateX::new(0, -CalculatorFloat::from("theta")));
     circuit.add_operation(BeamSplitter::new(
         0,
@@ -141,7 +142,7 @@ fn test_image() {
     assert!(circuit_to_image(
         &circuit,
         None,
-        RenderPragmas::None,
+        RenderPragmas::Partial(vec!["PragmaLoop".to_owned()]),
         Some(InitializationMode::Qubit),
         None,
     )

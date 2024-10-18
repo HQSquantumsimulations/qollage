@@ -611,7 +611,9 @@ pub fn circuit_into_typst_str(
                 Some(InitializationMode::Qubit) => format!("q[{n_qubit}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
-            is_first.then(|| ", label: \"Qubits\"").unwrap_or_default(),
+            is_first
+                .then_some(", label: \"Qubits\"")
+                .unwrap_or_default(),
             gates
                 .iter()
                 .map(|gate| {
@@ -636,7 +638,9 @@ pub fn circuit_into_typst_str(
                 Some(InitializationMode::Qubit) => format!("q[{n_boson}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
-            is_first.then(|| ", label: \"Bosons\"").unwrap_or_default(),
+            is_first
+                .then_some(", label: \"Bosons\"")
+                .unwrap_or_default(),
             gates.join(", ")
         ));
         is_first = false;
@@ -670,8 +674,10 @@ pub fn circuit_into_typst_str(
                 for gates in current_chunk.iter() {
                     typst_str.push_str(&format!(
                         "{}       lstick($${}), {}, 1, [\\ ],\n",
-                        is_first.then(|| "[\\ ],\n").unwrap_or_default(),
-                        is_first.then(|| ", label: \"Qubits\"").unwrap_or_default(),
+                        is_first.then_some("[\\ ],\n").unwrap_or_default(),
+                        is_first
+                            .then_some(", label: \"Qubits\"")
+                            .unwrap_or_default(),
                         gates
                             .iter()
                             .map(|gate| {
@@ -695,8 +701,10 @@ pub fn circuit_into_typst_str(
                 for gates in current_chunk.iter() {
                     typst_str.push_str(&format!(
                         "{}       lstick($${}), {}, 1, [\\ ],\n",
-                        is_first.then(|| "[\\ ],\n").unwrap_or_default(),
-                        is_first.then(|| ", label: \"Bosons\"").unwrap_or_default(),
+                        is_first.then_some("[\\ ],\n").unwrap_or_default(),
+                        is_first
+                            .then_some(", label: \"Bosons\"")
+                            .unwrap_or_default(),
                         gates.join(", ")
                     ));
                     is_first = false;
@@ -708,7 +716,7 @@ pub fn circuit_into_typst_str(
                     gates.insert(0, classical_gates[index][1].clone());
                     typst_str.push_str(&format!(
                         "{}       lstick($$), {}, 1, [\\ ],\n",
-                        is_first.then(|| "[\\ ],\n").unwrap_or_default(),
+                        is_first.then_some("[\\ ],\n").unwrap_or_default(),
                         gates.join(", "),
                     ));
                 }

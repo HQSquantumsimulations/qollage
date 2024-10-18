@@ -2281,12 +2281,15 @@ pub fn add_gate(
             circuit_gates[*op.qubit()].push("$ sqrt(Y)^(dagger) $".to_owned());
             Ok(())
         }
-        _ => ALLOWED_OPERATIONS
-            .contains(&operation.hqslang())
-            .then(|| Ok(()))
-            .unwrap_or(Err(RoqoqoBackendError::OperationNotInBackend {
-                backend: "TypstBackend",
-                hqslang: operation.hqslang(),
-            })),
+        _ => {
+            if ALLOWED_OPERATIONS.contains(&operation.hqslang()) {
+                Ok(())
+            } else {
+                Err(RoqoqoBackendError::OperationNotInBackend {
+                    backend: "TypstBackend",
+                    hqslang: operation.hqslang(),
+                })
+            }
+        }
     }
 }

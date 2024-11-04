@@ -2,6 +2,11 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
+## 0.4.2
+
+* Add supports to the new operations added in qoqo 1.16
+* Fixes some bugs with controlled operations
+
 ## 0.4.1
 
 * Updated MSRV to 1.70

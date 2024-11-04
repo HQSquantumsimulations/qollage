@@ -119,6 +119,16 @@ use test_case::test_case;
 #[test_case(Operation::from(PragmaSetDensityMatrix::new(array![[Complex64::new(1.0, 0.0), Complex64::new(0.0, 0.0)],[Complex64::new(0.0, 0.0), Complex64::new(0.0, 0.0)],])); "PragmaSetDensityMatrix")]
 #[test_case(Operation::from(InvSqrtPauliY::new(0)); "InvSqrtPauliY")]
 #[test_case(Operation::from(SqrtPauliY::new(0)); "SqrtPauliY")]
+#[test_case(Operation::from(InvSGate::new(0)); "InvSGate")]
+#[test_case(Operation::from(InvTGate::new(0)); "InvTGate")]
+#[test_case(Operation::from(SXGate::new(0)); "SXGate")]
+#[test_case(Operation::from(InvSXGate::new(0)); "InvSXGate")]
+#[test_case(Operation::from(ControlledSWAP::new(0, 1, 2)); "ControlledSWAP")]
+#[test_case(Operation::from(TripleControlledPauliX::new(0, 1, 2, 3)); "TripleControlledPauliX")]
+#[test_case(Operation::from(TripleControlledPauliZ::new(0, 1, 2, 3)); "TripleControlledPauliZ")]
+#[test_case(Operation::from(PhaseShiftedControlledControlledZ::new(0, 1, 2, CalculatorFloat::FRAC_PI_4)); "PhaseShiftedControlledControlledZ")]
+#[test_case(Operation::from(PhaseShiftedControlledControlledPhase::new(0, 1, 2, CalculatorFloat::FRAC_PI_4, CalculatorFloat::ZERO)); "PhaseShiftedControlledControlledPhase")]
+#[test_case(Operation::from(TripleControlledPhaseShift::new(0, 1, 2, 3, CalculatorFloat::ZERO)); "TripleControlledPhaseShift")]
 fn test_add_gate(operation: Operation) {
     let mut circuit_gates: Vec<Vec<String>> = Vec::new();
     let mut bosonic_gates: Vec<Vec<String>> = Vec::new();

@@ -342,11 +342,12 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
 fn prepare_for_ctrl(
     circuit_gates: &mut Vec<Vec<String>>,
     circuit_lock: &mut Vec<(usize, usize)>,
-    min: usize,
-    max: usize,
+    qubits: &[usize],
 ) {
-    add_qubits_vec(circuit_gates, &[min, max]);
-    flatten_qubits(circuit_gates, &[min, max]);
+    let min = qubits.iter().min().unwrap().to_owned();
+    let max = qubits.iter().max().unwrap().to_owned();
+    add_qubits_vec(circuit_gates, qubits);
+    flatten_qubits(circuit_gates, qubits);
     for qubit in min + 1..max {
         while circuit_lock.contains(&(qubit, effective_len(&circuit_gates[qubit]))) {
             circuit_lock.retain(|&val| val != (qubit, effective_len(&circuit_gates[qubit])));
@@ -359,7 +360,7 @@ fn prepare_for_ctrl(
             flatten_qubits(circuit_gates, &[min, qubit]);
         }
     }
-    flatten_qubits(circuit_gates, &[min, max]);
+    flatten_qubits(circuit_gates, qubits);
     for qubit in min + 1..max {
         circuit_lock.push((qubit, effective_len(&circuit_gates[min])));
     }
@@ -451,9 +452,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::CNOT(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -861,10 +860,7 @@ pub fn add_gate(
         Operation::SWAP(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({})", max - min));
             circuit_gates[max].push("targX()".to_owned());
             Ok(())
@@ -872,10 +868,7 @@ pub fn add_gate(
         Operation::ISwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({}, label: \"ISwap\")", max - min));
             circuit_gates[max].push("targX()".to_owned());
             Ok(())
@@ -883,10 +876,7 @@ pub fn add_gate(
         Operation::FSwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({}, label: \"FSwap\")", max - min));
             circuit_gates[max].push("targX()".to_owned());
             Ok(())
@@ -894,10 +884,7 @@ pub fn add_gate(
         Operation::SqrtISwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({}, label: $ sqrt(\"ISwap\") $)", max - min));
             circuit_gates[max].push("targX()".to_owned());
             Ok(())
@@ -905,10 +892,7 @@ pub fn add_gate(
         Operation::InvSqrtISwap(op) => {
             let min = *op.control().min(op.target());
             let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!(
                 "swap({}, label: $ sqrt(\"ISwap\")^(dagger))",
                 max - min
@@ -917,26 +901,19 @@ pub fn add_gate(
             Ok(())
         }
         Operation::XY(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"XY\"({}) $, n: {}, width: 5em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.theta()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            push_ones(circuit_gates, min, max);
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"XY\"({})$)",
+                format_calculator(op.theta()),
+            ));
             Ok(())
         }
         Operation::ControlledPhaseShift(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -948,9 +925,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::ControlledPauliY(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -959,9 +934,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::ControlledPauliZ(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -970,200 +943,142 @@ pub fn add_gate(
             Ok(())
         }
         Operation::MolmerSorensenXX(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"MolmerSorensenXX\" $, n: {}, width: 9em, inputs: ((qubit: {}), (qubit: {})))",
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "ctrl"),
-                format_qubit_input(*op.target() - min, "targ")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            push_ones(circuit_gates, min, max);
+            circuit_gates[*op.target()].push("gate($ \"MolmerSorensenXX\" $)".to_owned());
             Ok(())
         }
         Operation::VariableMSXX(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"VariableMSXX\"({}) $, n: {}, width: 10em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.theta()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            push_ones(circuit_gates, min, max);
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"VariableMSXX\"({}) $)",
+                format_calculator(op.theta())
+            ));
             Ok(())
         }
         Operation::GivensRotation(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"GivensRotation\"\\ ({},{}) $, n: {}, width: 11em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.theta()),
-                format_calculator(op.phi()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "ctrl"),
-                format_qubit_input(*op.target() - min, "targ")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            push_ones(circuit_gates, min, max);
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"GivensRotation\"({},{}) $)",
+                format_calculator(op.theta()),
+                format_calculator(op.phi())
+            ));
             Ok(())
         }
         Operation::GivensRotationLittleEndian(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"GivensRotationLE\"\\ ({},{}) $, n: {}, width: 12em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.theta()),
-                format_calculator(op.phi()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "ctrl"),
-                format_qubit_input(*op.target() - min, "targ")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            push_ones(circuit_gates, min, max);
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"GivensRotationLE\"({},{}) $)",
+                format_calculator(op.theta()),
+                format_calculator(op.phi())
+            ));
             Ok(())
         }
         Operation::Qsim(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"Qsim\"({},{},{}) $, n: {}, width: 11em, inputs: ((qubit: {}), (qubit: {})))",
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"Qsim\"({},{},{}) $)",
                 format_calculator(op.x()),
                 format_calculator(op.y()),
-                format_calculator(op.z()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
+                format_calculator(op.z())
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
             Ok(())
         }
         Operation::Fsim(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"Fsim\"({},{},{}) $, n: {}, width: 11em, inputs: ((qubit: {}), (qubit: {})))",
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"Fsim\"({},{},{}) $)",
                 format_calculator(op.t()),
                 format_calculator(op.u()),
                 format_calculator(op.delta()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
             Ok(())
         }
         Operation::SpinInteraction(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"SpinInteraction\"\\ ({},{},{}) $, n: {}, width: 12em, inputs: ((qubit: {}), (qubit: {})))",
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"SpinInteraction\"({},{},{}) $)",
                 format_calculator(op.x()),
                 format_calculator(op.y()),
-                format_calculator(op.z()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
+                format_calculator(op.z())
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
             Ok(())
         }
         Operation::Bogoliubov(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"Bogoliubov\"\\ ({}+{}i) $, n: {}, width: 9em, inputs: ((qubit: {}), (qubit: {})))",
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"Bogoliubov\"({},{}) $)",
                 format_calculator(op.delta_real()),
                 format_calculator(op.delta_imag()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
             Ok(())
         }
         Operation::PMInteraction(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"PMInteraction\"\\ ({}) $, n: {}, width: 9em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.t()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            push_ones(circuit_gates, min, max);
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"PMInteraction\"({}) $)",
+                format_calculator(op.t()),
+            ));
             Ok(())
         }
         Operation::ComplexPMInteraction(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"ComplexPMInteraction\"\\ ({},{}i) $, n: {}, width: 12em, inputs: ((qubit: {}), (qubit: {})))",
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"ComplexPMInteraction\"({},{}) $)",
                 format_calculator(op.t_real()),
                 format_calculator(op.t_imag()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "x"),
-                format_qubit_input(*op.target() - min, "x")
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
             Ok(())
         }
         Operation::PhaseShiftedControlledZ(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"PhaseShiftedControlledZ\"\\ ({}) $, n: {}, width: 15em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.phi()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "ctrl"),
-                format_qubit_input(*op.target() - min, "targ")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"PhaseShiftedControlledZ\"({}) $)",
+                format_calculator(op.phi()),
+            ));
             Ok(())
         }
         Operation::MultiQubitMS(op) => {
@@ -1703,28 +1618,20 @@ pub fn add_gate(
             Ok(())
         }
         Operation::PhaseShiftedControlledPhase(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            let qubits: Vec<usize> = (min..max + 1).collect();
-            add_qubits_vec(circuit_gates, &qubits);
-            flatten_qubits(circuit_gates, &qubits);
-            circuit_gates[min].push(format!(
-                "mqgate($ \"PhaseShiftedControlledPhase\"\\ ({},{}) $, n: {}, width: 14em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.theta()),
-                format_calculator(op.phi()),
-                qubits.len(),
-                format_qubit_input(*op.control() - min, "ctrl"),
-                format_qubit_input(*op.target() - min, "targ")
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
+            circuit_gates[*op.control()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control() as i32
             ));
-            for gates in circuit_gates.iter_mut().take(max + 1).skip(min + 1) {
-                gates.push("1".to_owned());
-            }
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"PhaseShiftControlledPhase\"({},{})$)",
+                format_calculator(op.theta()),
+                format_calculator(op.phi())
+            ));
             Ok(())
         }
         Operation::ControlledRotateX(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -1736,9 +1643,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::ControlledRotateXY(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -1752,11 +1657,9 @@ pub fn add_gate(
         }
         Operation::ControlledControlledPauliZ(op) => {
             let qubits = &[*op.control_0(), *op.target(), *op.control_1()];
-            let min = qubits.iter().min().unwrap().to_owned();
-            let max = qubits.iter().max().unwrap().to_owned();
             add_qubits_vec(circuit_gates, qubits);
             flatten_qubits(circuit_gates, qubits);
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
             flatten_qubits(circuit_gates, qubits);
             circuit_gates[*op.control_0()].push(format!(
                 "ctrl({})",
@@ -1771,11 +1674,9 @@ pub fn add_gate(
         }
         Operation::ControlledControlledPhaseShift(op) => {
             let qubits = &[*op.control_0(), *op.target(), *op.control_1()];
-            let min = qubits.iter().min().unwrap().to_owned();
-            let max = qubits.iter().max().unwrap().to_owned();
             add_qubits_vec(circuit_gates, qubits);
             flatten_qubits(circuit_gates, qubits);
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
             flatten_qubits(circuit_gates, qubits);
             circuit_gates[*op.control_0()].push(format!(
                 "ctrl({})",
@@ -1785,17 +1686,14 @@ pub fn add_gate(
                 "ctrl({})",
                 *op.target() as i32 - *op.control_1() as i32
             ));
-            circuit_gates[*op.target()].push("gate($ \"PhaseShift\" $)".to_owned());
+            circuit_gates[*op.target()].push(format!("gate($ \"PhaseShift\"({}) $)", op.theta()));
             Ok(())
         }
         Operation::Toffoli(op) => {
             let qubits = &[*op.control_0(), *op.target(), *op.control_1()];
-            let min = qubits.iter().min().unwrap().to_owned();
-            let max = qubits.iter().max().unwrap().to_owned();
             add_qubits_vec(circuit_gates, qubits);
             flatten_qubits(circuit_gates, qubits);
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
-            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
             circuit_gates[*op.control_0()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control_0() as i32
@@ -1989,9 +1887,7 @@ pub fn add_gate(
             Ok(())
         }
         Operation::EchoCrossResonance(op) => {
-            let min = *op.control().min(op.target());
-            let max = *op.control().max(op.target());
-            prepare_for_ctrl(circuit_gates, circuit_lock, min, max);
+            prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[*op.control()].push(format!(
                 "ctrl({})",
                 *op.target() as i32 - *op.control() as i32
@@ -2279,6 +2175,158 @@ pub fn add_gate(
         Operation::InvSqrtPauliY(op) => {
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push("$ sqrt(Y)^(dagger) $".to_owned());
+            Ok(())
+        }
+        Operation::InvSGate(op) => {
+            add_qubits_vec(circuit_gates, &[*op.qubit()]);
+            circuit_gates[*op.qubit()].push("$ S^(dagger) $".to_owned());
+            Ok(())
+        }
+        Operation::InvTGate(op) => {
+            add_qubits_vec(circuit_gates, &[*op.qubit()]);
+            circuit_gates[*op.qubit()].push("$ T^(dagger) $".to_owned());
+            Ok(())
+        }
+        Operation::SXGate(op) => {
+            add_qubits_vec(circuit_gates, &[*op.qubit()]);
+            circuit_gates[*op.qubit()].push("$ \"SX\" $".to_owned());
+            Ok(())
+        }
+        Operation::InvSXGate(op) => {
+            add_qubits_vec(circuit_gates, &[*op.qubit()]);
+            circuit_gates[*op.qubit()].push("$ \"SX\"^(dagger) $".to_owned());
+            Ok(())
+        }
+        Operation::ControlledSWAP(op) => {
+            let qubits = &[*op.control_0(), *op.target_0(), *op.target_1()];
+            add_qubits_vec(circuit_gates, qubits);
+            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
+            let min = op.target_0().min(op.target_1()).to_owned();
+            let max = op.target_0().max(op.target_1()).to_owned();
+            circuit_gates[*op.control_0()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_0() as i32
+            ));
+            circuit_gates[min].push(format!("swap({})", max - min));
+            circuit_gates[max].push("targX()".to_owned());
+            Ok(())
+        }
+        Operation::PhaseShiftedControlledControlledZ(op) => {
+            let qubits = &[*op.control_0(), *op.target(), *op.control_1()];
+            add_qubits_vec(circuit_gates, qubits);
+            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
+            circuit_gates[*op.control_0()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_0() as i32
+            ));
+            circuit_gates[*op.control_1()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_1() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"PhaseShiftedControlledControlledZ\"({})$)",
+                format_calculator(op.phi())
+            ));
+            Ok(())
+        }
+        Operation::PhaseShiftedControlledControlledPhase(op) => {
+            let qubits = &[*op.control_0(), *op.target(), *op.control_1()];
+            add_qubits_vec(circuit_gates, qubits);
+            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
+            circuit_gates[*op.control_0()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_0() as i32
+            ));
+            circuit_gates[*op.control_1()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_1() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"PhaseShiftedControlledControlledPhase\"({},{})$)",
+                format_calculator(op.theta()),
+                format_calculator(op.phi())
+            ));
+            Ok(())
+        }
+        Operation::TripleControlledPauliX(op) => {
+            let qubits = &[
+                *op.control_0(),
+                *op.control_1(),
+                *op.control_2(),
+                *op.target(),
+            ];
+            add_qubits_vec(circuit_gates, qubits);
+            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
+            circuit_gates[*op.control_0()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_0() as i32
+            ));
+            circuit_gates[*op.control_1()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_1() as i32
+            ));
+            circuit_gates[*op.control_2()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_2() as i32
+            ));
+            circuit_gates[*op.target()].push("targ()".to_owned());
+            Ok(())
+        }
+        Operation::TripleControlledPauliZ(op) => {
+            let qubits = &[
+                *op.control_0(),
+                *op.control_1(),
+                *op.control_2(),
+                *op.target(),
+            ];
+            add_qubits_vec(circuit_gates, qubits);
+            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
+            circuit_gates[*op.control_0()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_0() as i32
+            ));
+            circuit_gates[*op.control_1()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_1() as i32
+            ));
+            circuit_gates[*op.control_2()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_2() as i32
+            ));
+            circuit_gates[*op.target()].push("$ Z $".to_owned());
+            Ok(())
+        }
+        Operation::TripleControlledPhaseShift(op) => {
+            let qubits = &[
+                *op.control_0(),
+                *op.control_1(),
+                *op.control_2(),
+                *op.target(),
+            ];
+            add_qubits_vec(circuit_gates, qubits);
+            flatten_qubits(circuit_gates, qubits);
+            prepare_for_ctrl(circuit_gates, circuit_lock, qubits);
+            circuit_gates[*op.control_0()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_0() as i32
+            ));
+            circuit_gates[*op.control_1()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_1() as i32
+            ));
+            circuit_gates[*op.control_2()].push(format!(
+                "ctrl({})",
+                *op.target() as i32 - *op.control_2() as i32
+            ));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"TripleControlledPhaseShift\"({})$)",
+                format_calculator(op.theta()),
+            ));
             Ok(())
         }
         _ => {

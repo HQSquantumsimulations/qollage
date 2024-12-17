@@ -161,7 +161,7 @@ fn format_symbol_str(str_value: &str) -> String {
     let symbol = all_symbols.scope().get(main_variant);
     match symbol {
         Some(Symbol(symbol))
-            if sup.eq("") || symbol.variants().any(|(variant, _repr)| variant.eq(sup)) =>
+            if sup.is_empty() || symbol.variants().any(|(variant, _repr)| variant.eq(sup)) =>
         {
             str_value.to_owned()
         }

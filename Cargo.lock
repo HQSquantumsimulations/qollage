@@ -1755,7 +1755,7 @@ dependencies = [
 
 [[package]]
 name = "qollage"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "image 0.25.5",
  "ndarray",

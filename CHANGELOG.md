@@ -2,20 +2,25 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
+## 0.5.0
+
+* Updated qoqo to 1.18 and qoqo_calculator to 1.4.
+* Updated pyo3 to 0.22 to upport python 3.13.
+
 ## 0.4.3
 
-* Updated the MSRV to 1.76
+* Updated the MSRV to 1.76.
 
 ## 0.4.2
 
-* Add supports to the new operations added in qoqo 1.16
-* Fixes some bugs with controlled operations
+* Add supports to the new operations added in qoqo 1.16.
+* Fixes some bugs with controlled operations.
 
 ## 0.4.1
 
-* Updated MSRV to 1.70
-* Updated to qoqo 1.16
-* Updated to maturin >=1.0,<2.0
+* Updated MSRV to 1.70.
+* Updated to qoqo 1.16.
+* Updated to maturin >=1.0,<2.0.
 
 ## 0.4.0
 
@@ -32,13 +37,13 @@ This changelog track changes to the qollage project starting at version v0.1.0
 
 ## 0.2.2
 
-* Fixed a bug where a gate that has an optional circuit would sometimes fail to be rendered (e.g. PragmaGetStateVector)
+* Fixed a bug where a gate that has an optional circuit would sometimes fail to be rendered (e.g. PragmaGetStateVector).
 * Improved spacing to avoid text overlap.
-* Added support for GateDefinition and CalledDefinedGate
+* Added support for GateDefinition and CalledDefinedGate.
 
 ## 0.2.1
 
-* Fixed a build error
+* Fixed a build error.
 
 ## 0.2.0
 

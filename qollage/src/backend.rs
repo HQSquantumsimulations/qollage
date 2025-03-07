@@ -141,10 +141,10 @@ pub fn draw_circuit(
         })?;
 
     Python::with_gil(|py| {
-        let pil = PyModule::import_bound(py, "PIL.Image").unwrap();
-        let io = PyModule::import_bound(py, "io").unwrap();
-        let display = PyModule::import_bound(py, "IPython.display").unwrap();
-        let builtins = PyModule::import_bound(py, "builtins").unwrap();
+        let pil = PyModule::import(py, "PIL.Image").unwrap();
+        let io = PyModule::import(py, "io").unwrap();
+        let display = PyModule::import(py, "IPython.display").unwrap();
+        let builtins = PyModule::import(py, "builtins").unwrap();
 
         let bytes_image_data = builtins
             .call_method1("bytes", (buffer.clone().into_inner(),))

@@ -2,6 +2,10 @@
 
 This changelog track changes to the qollage project starting at version v0.1.0
 
+## 0.6.0
+
+* Updated to pyo3 0.23.
+
 ## 0.5.0
 
 * Updated qoqo to 1.18 and qoqo_calculator to 1.4.

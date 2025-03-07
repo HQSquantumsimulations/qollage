@@ -1,6 +1,6 @@
 [package]
 name = "qollage"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -19,24 +19,24 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qoqo = { version = "~1.18", default-features = false }
-roqoqo = { version = "~1.18", features = ["serialize"] }
-roqollage = { version = "~0.5", path = "../roqollage" }
+qoqo = { version = "~1.19", default-features = false }
+roqoqo = { version = "~1.19", features = ["serialize"] }
+roqollage = { version = "~0.6", path = "../roqollage" }
 image = "0.25"
 
 [dependencies.pyo3]
-version = "0.22"
+version = "0.23"
 features = ["num-complex"]
 
 [dev-dependencies]
 test-case = "3.0"
-qoqo_calculator = "1.4"
-qoqo_calculator_pyo3 = { version = "1.4", default-features = false }
+qoqo_calculator = "1.5"
+qoqo_calculator_pyo3 = { version = "1.5", default-features = false }
 ndarray = "0.16"
 
 [build-dependencies]
-pyo3-build-config = "0.22"
-pyo3 = "0.22"
+pyo3-build-config = "0.23"
+pyo3 = "0.23"
 
 [features]
 extension-module = ["pyo3/extension-module"]

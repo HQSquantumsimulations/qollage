@@ -298,7 +298,7 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
         let last_slice = circuit_gates[0]
             .iter()
             .filter(|gate| gate.contains("slice") || gate.contains("gategroup"))
-            .last();
+            .next_back();
         if let Some(last_slice) = last_slice {
             let dist_to_max = circuit_gates
                 .iter()

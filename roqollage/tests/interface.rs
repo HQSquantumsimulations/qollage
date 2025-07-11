@@ -129,6 +129,8 @@ use test_case::test_case;
 #[test_case(Operation::from(PhaseShiftedControlledControlledZ::new(0, 1, 2, CalculatorFloat::FRAC_PI_4)); "PhaseShiftedControlledControlledZ")]
 #[test_case(Operation::from(PhaseShiftedControlledControlledPhase::new(0, 1, 2, CalculatorFloat::FRAC_PI_4, CalculatorFloat::ZERO)); "PhaseShiftedControlledControlledPhase")]
 #[test_case(Operation::from(TripleControlledPhaseShift::new(0, 1, 2, 3, CalculatorFloat::ZERO)); "TripleControlledPhaseShift")]
+#[test_case(Operation::from(MultiQubitCNOT::new([0, 1, 2, 3].to_vec())); "MultiQubitCNOT")]
+#[test_case(Operation::from(QFT::new([0, 1, 2, 3].to_vec(), false, false)); "QFT")]
 fn test_add_gate(operation: Operation) {
     let mut circuit_gates: Vec<Vec<String>> = Vec::new();
     let mut bosonic_gates: Vec<Vec<String>> = Vec::new();
@@ -164,6 +166,8 @@ fn test_add_gate(operation: Operation) {
 #[test_case(Operation::from(PragmaGetPauliProduct::new(HashMap::from([]), "ro".into(), Circuit::new(),)); "PragmaGetPauliProduct2")]
 #[test_case(Operation::from(PragmaAnnotatedOp::new(InputBit::new("ro".to_owned(), 0, true).into(), "test".to_string())); "PragmaAnnotatedOp")]
 #[test_case(Operation::from(PragmaControlledCircuit::new(10, vec![Operation::from(InputBit::new("ro".to_owned(), 0, true))].into_iter().collect())); "PragmaControlledCircuit")]
+#[test_case(Operation::from(MultiQubitCNOT::new([].to_vec())); "MultiQubitCNOT")]
+#[test_case(Operation::from(QFT::new([].to_vec(), false, false)); "QFT")]
 fn test_add_gate_errors(operation: Operation) {
     let mut circuit_gates: Vec<Vec<String>> = Vec::new();
     let mut bosonic_gates: Vec<Vec<String>> = Vec::new();

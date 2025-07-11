@@ -77,7 +77,7 @@ pub fn save_circuit(
                 if s.ends_with(".png") {
                     s
                 } else {
-                    format!("{}.png", s)
+                    format!("{s}.png")
                 }
             }
         }

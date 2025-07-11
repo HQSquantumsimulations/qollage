@@ -282,7 +282,7 @@ fn replace_classical_index(
 ) -> String {
     let mut output = classical_gate.to_owned();
     for index in 0..n_classical + 1 {
-        let pattern = format!("replace_by_classical_len_{}", index);
+        let pattern = format!("replace_by_classical_len_{index}");
         if output.contains(&pattern) {
             output = output.replace(&pattern, &(index + n_qubits + n_bosons).to_string());
         }
@@ -301,7 +301,7 @@ fn replace_classical_index(
 fn replace_boson_index(bosonic_gate: &String, n_qubits: usize, n_bosons: usize) -> String {
     let mut output = bosonic_gate.to_owned();
     for boson in 0..n_bosons + 1 {
-        let pattern = format!("replace_by_n_qubits_plus_{}", boson);
+        let pattern = format!("replace_by_n_qubits_plus_{boson}");
         if output.contains(&pattern) {
             output = output.replace(&pattern, &(boson + n_qubits).to_string());
         }
@@ -611,9 +611,11 @@ pub fn circuit_into_typst_str(
                 Some(InitializationMode::Qubit) => format!("q[{n_qubit}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
-            is_first
-                .then_some(", label: \"Qubits\"")
-                .unwrap_or_default(),
+            if is_first {
+                ", label: \"Qubits\""
+            } else {
+                Default::default()
+            },
             gates
                 .iter()
                 .map(|gate| {
@@ -638,9 +640,11 @@ pub fn circuit_into_typst_str(
                 Some(InitializationMode::Qubit) => format!("q[{n_boson}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
-            is_first
-                .then_some(", label: \"Bosons\"")
-                .unwrap_or_default(),
+            if is_first {
+                ", label: \"Bosons\""
+            } else {
+                Default::default()
+            },
             gates.join(", ")
         ));
         is_first = false;
@@ -674,10 +678,16 @@ pub fn circuit_into_typst_str(
                 for gates in current_chunk.iter() {
                     typst_str.push_str(&format!(
                         "{}       lstick($${}), {}, 1, [\\ ],\n",
-                        is_first.then_some("[\\ ],\n").unwrap_or_default(),
-                        is_first
-                            .then_some(", label: \"Qubits\"")
-                            .unwrap_or_default(),
+                        if is_first {
+                            "[\\ ],\n"
+                        } else {
+                            Default::default()
+                        },
+                        if is_first {
+                            ", label: \"Qubits\""
+                        } else {
+                            Default::default()
+                        },
                         gates
                             .iter()
                             .map(|gate| {
@@ -701,10 +711,16 @@ pub fn circuit_into_typst_str(
                 for gates in current_chunk.iter() {
                     typst_str.push_str(&format!(
                         "{}       lstick($${}), {}, 1, [\\ ],\n",
-                        is_first.then_some("[\\ ],\n").unwrap_or_default(),
-                        is_first
-                            .then_some(", label: \"Bosons\"")
-                            .unwrap_or_default(),
+                        if is_first {
+                            "[\\ ],\n"
+                        } else {
+                            Default::default()
+                        },
+                        if is_first {
+                            ", label: \"Bosons\""
+                        } else {
+                            Default::default()
+                        },
                         gates.join(", ")
                     ));
                     is_first = false;
@@ -716,7 +732,11 @@ pub fn circuit_into_typst_str(
                     gates.insert(0, classical_gates[index][1].clone());
                     typst_str.push_str(&format!(
                         "{}       lstick($$), {}, 1, [\\ ],\n",
-                        is_first.then_some("[\\ ],\n").unwrap_or_default(),
+                        if is_first {
+                            "[\\ ],\n"
+                        } else {
+                            Default::default()
+                        },
                         gates.join(", "),
                     ));
                 }

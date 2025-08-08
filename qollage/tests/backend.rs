@@ -38,9 +38,9 @@ fn test_file() {
     let mut circuit = Circuit::new();
     circuit.add_operation(Hadamard::new(0));
     circuit.add_operation(RotateY::new(1, CalculatorFloat::PI));
-    // circuit.add_operation(RotateX::new(0, CalculatorFloat::from("sys_2 + 2*1e0")));
-    // circuit.add_operation(RotateX::new(0, CalculatorFloat::from("theta.alt")));
-    // circuit.add_operation(RotateX::new(0, CalculatorFloat::from("times.three.r")));
+    circuit.add_operation(RotateX::new(0, CalculatorFloat::from("sys_2 + 2*1e0")));
+    circuit.add_operation(RotateX::new(0, CalculatorFloat::from("theta.alt")));
+    circuit.add_operation(RotateX::new(0, CalculatorFloat::from("times.three.r")));
     circuit.add_operation(RotateX::new(0, CalculatorFloat::from("test")));
     circuit.add_operation(PragmaBoostNoise::new(CalculatorFloat::from("12.7")));
     circuit.add_operation(CNOT::new(2, 5));
@@ -58,7 +58,6 @@ fn test_file() {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
-        save_circuit(&circuitpy, None, 1.5, "PragmaOverrotation", None, None).unwrap();
         assert!(save_circuit(&circuitpy, None, 1.5, "PragmaOverrotation", None, None).is_ok());
         assert!(save_circuit(
             &circuitpy,

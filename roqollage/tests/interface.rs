@@ -15,7 +15,7 @@
 use ndarray::array;
 use num_complex::Complex64;
 use qoqo_calculator::CalculatorFloat;
-use roqollage::add_gate;
+use roqollage::{add_gate, circuit_to_image};
 use roqoqo::{operations::*, Circuit};
 use std::collections::HashMap;
 use std::f64::consts::PI;
@@ -149,6 +149,9 @@ fn test_add_gate(operation: Operation) {
         &roqollage::RenderPragmas::All,
     )
     .is_ok());
+    let mut circuit = roqoqo::Circuit::new();
+    circuit += operation;
+    assert!(circuit_to_image(&circuit, None, roqollage::RenderPragmas::All, None, None).is_ok())
 }
 
 #[test_case(Operation::from(PragmaStartDecompositionBlock::new(vec![], HashMap::new())); "PragmaStartDecompositionBlock")]

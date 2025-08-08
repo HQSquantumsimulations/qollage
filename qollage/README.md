@@ -39,6 +39,8 @@ circuit += ops.MeasureQubit(1, "ro", 1)
 draw_circuit(circuit)
 ```
 
+The API documentation is available [here](https://hqsquantumsimulations.github.io/qollage/).
+
 ## General Notes
 
 This software is still in the beta stage. Functions and documentation are not yet complete and breaking changes can occur.

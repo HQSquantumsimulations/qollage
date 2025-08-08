@@ -11,23 +11,22 @@
 // limitations under the License.
 
 use std::{
-    cell::RefCell,
     collections::HashMap,
     io::{Cursor, Write},
     path::PathBuf,
     str::FromStr,
+    sync::RwLock,
 };
 
-use comemo::Prehashed;
 use image::DynamicImage;
 use roqoqo::{Circuit, RoqoqoBackendError, RoqoqoError};
 use typst::{
-    diag::{EcoString, FileError, FileResult, PackageError},
-    eval::Tracer,
+    diag::{FileError, FileResult, PackageError},
     foundations::{Bytes, Datetime},
+    layout::PagedDocument,
     syntax::{FileId, Source},
     text::{Font, FontBook},
-    visualize::Color,
+    utils::LazyHash,
     Library,
 };
 
@@ -39,16 +38,16 @@ use crate::{add_gate, effective_len, flatten_multiple_vec};
 ///
 /// This backend will be used to compile a typst string to an image.
 /// It has to implement the typst::World trait.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TypstBackend {
     /// Typst standard library used by the backend.
-    library: Prehashed<Library>,
+    library: LazyHash<Library>,
     /// Metadata about a collection of fonts.
-    book: Prehashed<FontBook>,
+    book: LazyHash<FontBook>,
     /// Typst source file to be compiled.
     source: Source,
     /// Typst dependency files used during compilation.
-    files: RefCell<HashMap<FileId, Bytes>>,
+    files: RwLock<HashMap<FileId, Bytes>>,
     /// Collection of fonts.
     fonts: Vec<Font>,
     /// Current time.
@@ -93,13 +92,14 @@ impl TypstBackend {
                 })?
             }
         };
-        let buffer = Bytes::from(bytes);
+        let buffer = Bytes::new(bytes);
         let fonts = Font::new(buffer.clone(), 0).map_or_else(std::vec::Vec::new, |font| vec![font]);
+        let library = Library::builder().build();
         Ok(Self {
-            library: Prehashed::new(Library::default()),
-            book: Prehashed::new(FontBook::from_fonts(&fonts)),
+            library: LazyHash::new(library),
+            book: LazyHash::new(FontBook::from_fonts(&fonts)),
             source: Source::detached(typst_str.clone()),
-            files: RefCell::new(HashMap::new()),
+            files: RwLock::new(HashMap::new()),
             fonts,
             time: time::OffsetDateTime::now_utc(),
             dependencies: PathBuf::from_str(".qollage/cache").map_err(|_| {
@@ -130,13 +130,13 @@ impl TypstBackend {
             .map_err(|err| RoqoqoBackendError::NetworkError {
                 msg: format!("Couldn't download the font file: {err}."),
             })?;
-        let mut data = Vec::new();
-        response
-            .into_reader()
-            .read_to_end(&mut data)
-            .map_err(|err| RoqoqoBackendError::NetworkError {
-                msg: format!("Couldn't read the font file: {err}."),
-            })?;
+        let data =
+            response
+                .into_body()
+                .read_to_vec()
+                .map_err(|err| RoqoqoBackendError::NetworkError {
+                    msg: format!("Couldn't read the font file: {err}."),
+                })?;
         let mut file =
             std::fs::File::create(&path).map_err(|err| RoqoqoBackendError::GenericError {
                 msg: format!("Couldn't create the font file: {err}."),
@@ -155,7 +155,12 @@ impl TypstBackend {
     ///
     /// * `id` - The id of the dependency file to load.
     fn load_file(&self, id: FileId) -> Result<Bytes, FileError> {
-        if let Some(bytes) = self.files.borrow().get(&id) {
+        if let Some(bytes) = self
+            .files
+            .read()
+            .expect("Backend couldn't access the files.")
+            .get(&id)
+        {
             return Ok(bytes.clone());
         }
         if let Some(package) = id.package() {
@@ -170,11 +175,10 @@ impl TypstBackend {
                 let response = ureq::get(&url)
                     .call()
                     .map_err(|_| FileError::AccessDenied)?;
-                let mut data = Vec::new();
-                response
-                    .into_reader()
-                    .read_to_end(&mut data)
-                    .map_err(|error| FileError::from_io(error, &package_path))?;
+                let data = response
+                    .into_body()
+                    .read_to_vec()
+                    .map_err(|error| FileError::from_io(error.into_io(), &package_path))?;
                 let decompressed_data = zune_inflate::DeflateDecoder::new(&data)
                     .decode_gzip()
                     .map_err(|error| {
@@ -192,8 +196,12 @@ impl TypstBackend {
             if let Some(file_path) = id.vpath().resolve(&package_path) {
                 let contents = std::fs::read(&file_path)
                     .map_err(|error| FileError::from_io(error, &file_path))?;
-                self.files.borrow_mut().insert(id, contents.clone().into());
-                return Ok(contents.into());
+                let bytes_content = Bytes::new(contents);
+                self.files
+                    .write()
+                    .expect("Backend couldn't access the files.")
+                    .insert(id, bytes_content.clone());
+                return Ok(bytes_content);
             }
         }
         Err(FileError::NotFound(id.vpath().as_rootless_path().into()))
@@ -202,18 +210,18 @@ impl TypstBackend {
 
 impl typst::World for TypstBackend {
     /// The standard library.
-    fn library(&self) -> &Prehashed<Library> {
+    fn library(&self) -> &LazyHash<Library> {
         &self.library
     }
 
     /// Metadata about all known fonts.
-    fn book(&self) -> &Prehashed<FontBook> {
+    fn book(&self) -> &LazyHash<FontBook> {
         &self.book
     }
 
     /// Access the main source file.
-    fn main(&self) -> Source {
-        self.source.clone()
+    fn main(&self) -> FileId {
+        self.source.id()
     }
 
     /// Try to access the specified source file.
@@ -342,29 +350,32 @@ pub fn render_typst_str(
     pixels_per_point: Option<f32>,
 ) -> Result<DynamicImage, RoqoqoBackendError> {
     let typst_backend = TypstBackend::new(typst_str)?;
-    let mut tracer = Tracer::default();
-    let doc = typst::compile(&typst_backend, &mut tracer).map_err(|err| {
-        RoqoqoBackendError::GenericError {
-            msg: format!(
-                "Error during the Typst compilation: {}",
-                err.iter()
-                    .map(|source| format!(
-                        "error: {}, Hints: {}",
-                        source.message.as_str(),
-                        source
-                            .hints
-                            .iter()
-                            .map(EcoString::as_str)
-                            .collect::<Vec<&str>>()
-                            .join(","),
-                    ))
-                    .collect::<Vec<String>>()
-                    .join("\n")
-            ),
-        }
-    })?;
+    let doc: PagedDocument =
+        typst::compile(&typst_backend)
+            .output
+            .map_err(|err| RoqoqoBackendError::GenericError {
+                msg: format!(
+                    "Error during the Typst compilation: {}",
+                    err.iter()
+                        .map(|diag| {
+                            format!(
+                                "File: {:?}, Range: {:?}, Severity: {:?}, Message: {}, Hints: [{}]",
+                                diag.span.id(),
+                                diag.span.range(),
+                                diag.severity,
+                                diag.message,
+                                diag.hints
+                                    .iter()
+                                    .map(|h| h.as_str())
+                                    .collect::<Vec<_>>()
+                                    .join(", ")
+                            )
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                ),
+            })?;
     let mut writer = Cursor::new(Vec::new());
-    let background = Color::from_u8(255, 255, 255, 255);
     let pixmap = typst_render::render(
         &doc.pages
             .first()
@@ -372,9 +383,8 @@ pub fn render_typst_str(
             .map_err(|_| RoqoqoBackendError::GenericError {
                 msg: "Typst document has no pages.".to_owned(),
             })?
-            .frame,
+            .clone(),
         pixels_per_point.unwrap_or(3.0),
-        background,
     );
     image::write_buffer_with_format(
         &mut writer,
@@ -541,13 +551,13 @@ fn split_in_chunk_preprocess(
 pub fn circuit_into_typst_str(
     circuit: &Circuit,
     render_pragmas: RenderPragmas,
-    initializasion_mode: Option<InitializationMode>,
+    initialization_mode: Option<InitializationMode>,
     max_length: Option<usize>,
 ) -> Result<String, RoqoqoBackendError> {
     let mut typst_str = r#"#set page(width: auto, height: auto, margin: 5pt)
 #show math.equation: set text(font: "Fira Math")
 #{ 
-    import "@preview/quill:0.2.1": *
+    import "@preview/quill:0.7.1": *
     quantum-circuit(
 "#
     .to_owned();
@@ -606,8 +616,8 @@ pub fn circuit_into_typst_str(
     let mut is_first = true;
     for (n_qubit, gates) in circuit_gates.iter().enumerate() {
         typst_str.push_str(&format!(
-            "       lstick(${}${}), {}, 1, [\\ ],\n",
-            match initializasion_mode {
+            "       lstick(${}${}), {} 1, [\\ ],\n",
+            match initialization_mode {
                 Some(InitializationMode::Qubit) => format!("q[{n_qubit}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
@@ -627,6 +637,7 @@ pub fn circuit_into_typst_str(
                         gate.to_owned()
                     }
                 })
+                .chain(vec!["".to_owned()].into_iter())
                 .collect::<Vec<String>>()
                 .join(", ")
         ));
@@ -636,7 +647,7 @@ pub fn circuit_into_typst_str(
     for (n_boson, gates) in bosonic_gates.iter().enumerate() {
         typst_str.push_str(&format!(
             "       lstick(${}${}), {}, 1, [\\ ],\n",
-            match initializasion_mode {
+            match initialization_mode {
                 Some(InitializationMode::Qubit) => format!("q[{n_boson}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
@@ -767,10 +778,10 @@ pub fn circuit_to_image(
     circuit: &Circuit,
     pixels_per_point: Option<f32>,
     render_pragmas: RenderPragmas,
-    initializasion_mode: Option<InitializationMode>,
+    initialization_mode: Option<InitializationMode>,
     max_length: Option<usize>,
 ) -> Result<DynamicImage, RoqoqoBackendError> {
     let typst_str =
-        circuit_into_typst_str(circuit, render_pragmas, initializasion_mode, max_length)?;
+        circuit_into_typst_str(circuit, render_pragmas, initialization_mode, max_length)?;
     render_typst_str(typst_str, pixels_per_point)
 }

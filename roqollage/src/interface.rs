@@ -157,9 +157,12 @@ pub(crate) fn flatten_multiple_vec(
 /// * `String` The formatted string.
 fn format_symbol_str(str_value: &str) -> String {
     let (main_variant, sup) = str_value.split_once('.').unwrap_or((str_value, ""));
-    let all_symbols = typst::symbols::sym();
-    let symbol = all_symbols.scope().get(main_variant);
-    match symbol {
+    let library = typst::Library::default();
+    let math = library.math.scope();
+    let global = library.global.scope();
+    let symbol = math.get(main_variant).or_else(|| global.get(main_variant));
+
+    match symbol.map(|binding| binding.read()) {
         Some(Symbol(symbol))
             if sup.is_empty() || symbol.variants().any(|(variant, _repr)| variant.eq(sup)) =>
         {
@@ -863,7 +866,7 @@ pub fn add_gate(
             let n_qubits = circuit_gates.len();
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
-                r#"slice(label: $ "ChangeDevice"\ \"{}\" $)"#,
+                r#"slice(label: $ "ChangeDevice" "{}" $)"#,
                 op.wrapped_hqslang,
             ));
             Ok(())
@@ -873,7 +876,7 @@ pub fn add_gate(
             let max = *op.control().max(op.target());
             prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({})", max - min));
-            circuit_gates[max].push("targX()".to_owned());
+            circuit_gates[max].push("swap()".to_owned());
             Ok(())
         }
         Operation::ISwap(op) => {
@@ -881,7 +884,7 @@ pub fn add_gate(
             let max = *op.control().max(op.target());
             prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({}, label: \"ISwap\")", max - min));
-            circuit_gates[max].push("targX()".to_owned());
+            circuit_gates[max].push("swap()".to_owned());
             Ok(())
         }
         Operation::FSwap(op) => {
@@ -889,7 +892,7 @@ pub fn add_gate(
             let max = *op.control().max(op.target());
             prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({}, label: \"FSwap\")", max - min));
-            circuit_gates[max].push("targX()".to_owned());
+            circuit_gates[max].push("swap()".to_owned());
             Ok(())
         }
         Operation::SqrtISwap(op) => {
@@ -897,7 +900,7 @@ pub fn add_gate(
             let max = *op.control().max(op.target());
             prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!("swap({}, label: $ sqrt(\"ISwap\") $)", max - min));
-            circuit_gates[max].push("targX()".to_owned());
+            circuit_gates[max].push("swap()".to_owned());
             Ok(())
         }
         Operation::InvSqrtISwap(op) => {
@@ -905,10 +908,10 @@ pub fn add_gate(
             let max = *op.control().max(op.target());
             prepare_for_ctrl(circuit_gates, circuit_lock, &[*op.control(), *op.target()]);
             circuit_gates[min].push(format!(
-                "swap({}, label: $ sqrt(\"ISwap\")^(dagger))",
+                "swap({}, label: $ sqrt(\"ISwap\")^(dagger) $)",
                 max - min
             ));
-            circuit_gates[max].push("targX()".to_owned());
+            circuit_gates[max].push("swap()".to_owned());
             Ok(())
         }
         Operation::XY(op) => {
@@ -1556,7 +1559,7 @@ pub fn add_gate(
             let n_qubits = circuit_gates.len();
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
-                "slice(label: $ \"Replace Symbole:\"\\ {}=>{} $)",
+                "slice(label: $ \"Replace Symbole:\"\\ \"{}\"=>{} $)",
                 op.name(),
                 format_calculator(&CalculatorFloat::from(op.input())),
             ));
@@ -1697,7 +1700,10 @@ pub fn add_gate(
                 "ctrl({})",
                 *op.target() as i32 - *op.control_1() as i32
             ));
-            circuit_gates[*op.target()].push(format!("gate($ \"PhaseShift\"({}) $)", op.theta()));
+            circuit_gates[*op.target()].push(format!(
+                "gate($ \"PhaseShift\"({}) $)",
+                format_calculator(op.theta())
+            ));
             Ok(())
         }
         Operation::Toffoli(op) => {
@@ -2220,7 +2226,7 @@ pub fn add_gate(
                 *op.target() as i32 - *op.control_0() as i32
             ));
             circuit_gates[min].push(format!("swap({})", max - min));
-            circuit_gates[max].push("targX()".to_owned());
+            circuit_gates[max].push("swap()".to_owned());
             Ok(())
         }
         Operation::PhaseShiftedControlledControlledZ(op) => {

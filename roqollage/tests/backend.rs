@@ -20,7 +20,7 @@ use roqollage::{
 };
 use roqoqo::{operations::*, Circuit};
 use serial_test::serial;
-use typst::eval::Tracer;
+use typst::layout::PagedDocument;
 
 #[test]
 #[serial]
@@ -271,6 +271,6 @@ fn test_values() {
 #[serial]
 fn test_backend_today() {
     let backend = TypstBackend::new("#datetime.today().display()".to_owned()).unwrap();
-    let mut tracer = Tracer::default();
-    assert!(typst::compile(&backend, &mut tracer).is_ok());
+    let res: Result<PagedDocument, _> = typst::compile(&backend).output;
+    assert!(res.is_ok());
 }

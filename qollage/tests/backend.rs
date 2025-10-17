@@ -58,7 +58,16 @@ fn test_file() {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
-        assert!(save_circuit(&circuitpy, None, 1.5, "PragmaOverrotation", None, None).is_ok());
+        assert!(save_circuit(
+            &circuitpy,
+            None,
+            1.5,
+            "PragmaOverrotation",
+            None,
+            None,
+            None
+        )
+        .is_ok());
         assert!(save_circuit(
             &circuitpy,
             Some("..".into()),
@@ -66,6 +75,7 @@ fn test_file() {
             "PragmaOverrotation",
             None,
             None,
+            None
         )
         .is_ok());
         assert!(save_circuit(
@@ -75,6 +85,7 @@ fn test_file() {
             "PragmaOverrotation",
             None,
             None,
+            None
         )
         .is_ok());
         assert!(save_circuit(
@@ -84,6 +95,7 @@ fn test_file() {
             "PragmaOverrotation",
             None,
             None,
+            None
         )
         .is_ok());
         assert!(save_circuit(
@@ -93,6 +105,7 @@ fn test_file() {
             "PragmaOverrotation",
             Some("Qubit".to_owned()),
             None,
+            None
         )
         .is_ok());
     });
@@ -143,17 +156,27 @@ fn test_file_error() {
         )
         .unwrap();
 
-        assert!(save_circuit(calc.bind(py), None, 1.5, "PragmaOverrotation", None, None).is_err());
+        assert!(save_circuit(
+            calc.bind(py),
+            None,
+            1.5,
+            "PragmaOverrotation",
+            None,
+            None,
+            None
+        )
+        .is_err());
         assert!(save_circuit(
             &circuitpy,
             None,
             1.5,
             "PragmaOverrotation",
             Some("not_a_mode".to_owned()),
+            None,
             None
         )
         .is_err());
-        assert!(save_circuit(&circuitpy, None, 1.5, "all", None, None).is_err());
+        assert!(save_circuit(&circuitpy, None, 1.5, "all", None, None, None).is_err());
     });
 }
 
@@ -183,8 +206,10 @@ fn test_str() {
     Python::with_gil(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
 
-        assert!(circuit_to_typst_str(&circuitpy, "", None, None).is_ok());
-        assert!(circuit_to_typst_str(&circuitpy, "all", Some("Qubit".to_owned()), None).is_ok());
+        assert!(circuit_to_typst_str(&circuitpy, "", None, None, None).is_ok());
+        assert!(
+            circuit_to_typst_str(&circuitpy, "all", Some("Qubit".to_owned()), None, None).is_ok()
+        );
     });
 }
 
@@ -222,15 +247,18 @@ fn test_str_error() {
         )
         .unwrap();
 
-        assert!(circuit_to_typst_str(calc.bind(py), "PragmaOverrotation", None, None).is_err());
+        assert!(
+            circuit_to_typst_str(calc.bind(py), "PragmaOverrotation", None, None, None).is_err()
+        );
         assert!(circuit_to_typst_str(
             &circuitpy,
             "PragmaOverrotation",
             Some("not_a_mode".to_owned()),
+            None,
             None
         )
         .is_err());
-        assert!(circuit_to_typst_str(&circuitpy, "", None, None).is_err());
+        assert!(circuit_to_typst_str(&circuitpy, "", None, None, None).is_err());
     });
 }
 
@@ -260,13 +288,14 @@ fn test_draw() {
     Python::with_gil(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
 
-        assert!(draw_circuit(&circuitpy, 0.5, "none", None, None).is_ok());
+        assert!(draw_circuit(&circuitpy, 0.5, "none", None, None, None).is_ok());
         assert!(draw_circuit(
             &circuitpy,
             0.5,
             "PragmaOverrotation",
             Some("State".to_owned()),
             None,
+            None
         )
         .is_ok());
     });
@@ -311,15 +340,16 @@ fn test_draw_error() {
         )
         .unwrap();
 
-        assert!(draw_circuit(calc.bind(py), 0.5, "PragmaOverrotation", None, None).is_err());
+        assert!(draw_circuit(calc.bind(py), 0.5, "PragmaOverrotation", None, None, None).is_err());
         assert!(draw_circuit(
             &circuitpy,
             0.5,
             "PragmaOverrotation",
             Some("not_a_mode".to_owned()),
+            None,
             None
         )
         .is_err());
-        assert!(draw_circuit(&circuitpy, 0.5, "PragmaOverrotation", None, None).is_err());
+        assert!(draw_circuit(&circuitpy, 0.5, "PragmaOverrotation", None, None, None).is_err());
     });
 }

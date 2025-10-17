@@ -147,11 +147,20 @@ fn test_add_gate(operation: Operation) {
         &mut classical_lock,
         &operation,
         &roqollage::RenderPragmas::All,
+        3
     )
     .is_ok());
     let mut circuit = roqoqo::Circuit::new();
     circuit += operation;
-    assert!(circuit_to_image(&circuit, None, roqollage::RenderPragmas::All, None, None).is_ok())
+    assert!(circuit_to_image(
+        &circuit,
+        None,
+        roqollage::RenderPragmas::All,
+        None,
+        None,
+        None
+    )
+    .is_ok())
 }
 
 #[test_case(Operation::from(PragmaStartDecompositionBlock::new(vec![], HashMap::new())); "PragmaStartDecompositionBlock")]
@@ -186,7 +195,8 @@ fn test_add_gate_errors(operation: Operation) {
         &mut bosonic_lock,
         &mut classical_lock,
         &operation,
-        &roqollage::RenderPragmas::All
+        &roqollage::RenderPragmas::All,
+        3
     )
     .is_err(),);
 }
@@ -210,6 +220,18 @@ fn test_add_gate_unstable(operation: Operation) {
         &mut classical_lock,
         &operation,
         &roqollage::RenderPragmas::All,
+        3
+    )
+    .is_ok());
+    let mut circuit = roqoqo::Circuit::new();
+    circuit += operation;
+    assert!(circuit_to_image(
+        &circuit,
+        None,
+        roqollage::RenderPragmas::All,
+        None,
+        None,
+        None
     )
     .is_ok());
 }
@@ -232,7 +254,8 @@ fn test_add_gate_unstable_errors(operation: Operation) {
         &mut bosonic_lock,
         &mut classical_lock,
         &operation,
-        &roqollage::RenderPragmas::All
+        &roqollage::RenderPragmas::All,
+        3
     )
     .is_err(),);
 }

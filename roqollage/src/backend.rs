@@ -544,6 +544,9 @@ fn split_in_chunk_preprocess(
 /// * `circuit` - The circuit to convert.
 /// * `render_pragmas` - Whether to render Pragma Operations or not.
 /// * `initialization_mode` - The initialization mode of the circuit representation.
+/// * `max_length` - The maximum length of a circuit line. If the circuit line is longer than this
+///   value, it will be split into multiple lines.
+/// * `rounding_accuracy` - The number of digits to round to when displaying floats.
 ///
 /// ## Returns
 ///
@@ -553,6 +556,7 @@ pub fn circuit_into_typst_str(
     render_pragmas: RenderPragmas,
     initialization_mode: Option<InitializationMode>,
     max_length: Option<usize>,
+    rounding_accuracy: Option<usize>,
 ) -> Result<String, RoqoqoBackendError> {
     let mut typst_str = r#"#set page(width: auto, height: auto, margin: 5pt)
 #show math.equation: set text(font: "Fira Math")
@@ -577,6 +581,7 @@ pub fn circuit_into_typst_str(
             &mut classical_lock,
             operation,
             &render_pragmas,
+            rounding_accuracy.unwrap_or(3),
         )?;
     }
     let n_qubits = circuit_gates.len();
@@ -770,6 +775,9 @@ pub fn circuit_into_typst_str(
 /// * `pixels_per_point` - The pixel per point ratio.
 /// * `render_pragmas` - Whether to render Pragma Operations or not.
 /// * `initialization_mode` - The initialization mode of the circuit representation.
+/// * `max_length` - The maximum length of a circuit line. If the circuit line
+///   is longer than this value, it will be split into multiple lines.
+/// * `rounding_accuracy` - The number of digits to round to when displaying floats.
 ///
 /// ## Returns
 ///
@@ -780,8 +788,14 @@ pub fn circuit_to_image(
     render_pragmas: RenderPragmas,
     initialization_mode: Option<InitializationMode>,
     max_length: Option<usize>,
+    rounding_accuracy: Option<usize>,
 ) -> Result<DynamicImage, RoqoqoBackendError> {
-    let typst_str =
-        circuit_into_typst_str(circuit, render_pragmas, initialization_mode, max_length)?;
+    let typst_str = circuit_into_typst_str(
+        circuit,
+        render_pragmas,
+        initialization_mode,
+        max_length,
+        rounding_accuracy,
+    )?;
     render_typst_str(typst_str, pixels_per_point)
 }

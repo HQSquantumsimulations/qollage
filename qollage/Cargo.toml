@@ -1,6 +1,6 @@
 [package]
 name = "qollage"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -21,7 +21,7 @@ doctest = false
 [dependencies]
 qoqo = { version = "~1.21", default-features = false }
 roqoqo = { version = "~1.21", features = ["serialize"] }
-roqollage = { version = "~0.8", path = "../roqollage" }
+roqollage = { version = "~0.9", path = "../roqollage" }
 image = "0.25"
 
 [dependencies.pyo3]

@@ -4,6 +4,10 @@ This changelog track changes to the qollage project starting at version v0.1.0
 
 ## Unpublished
 
+## 0.9.0
+
+* Added a new optional parameter: `rounding_accuracy` to allow the user to choose the number of
+    decimals displayed for floats. 
 * Updated minimum supported Python version to 3.10.
 
 ## 0.8.0

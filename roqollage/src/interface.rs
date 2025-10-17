@@ -191,7 +191,7 @@ fn count_digits(num: f64) -> usize {
 /// # Returns
 ///
 /// * `String` The calculator's typst representation.
-fn format_calculator(calculator: &CalculatorFloat) -> String {
+fn format_calculator(calculator: &CalculatorFloat, rounding_accuracy: usize) -> String {
     match calculator {
         CalculatorFloat::Float(float_value) => match float_value {
             v if (v - std::f64::consts::PI).abs() < EPSILON => "pi".to_owned(),
@@ -219,13 +219,9 @@ fn format_calculator(calculator: &CalculatorFloat) -> String {
                 _ => format!("\"{v:.2e}\""),
             },
             _ => {
-                if float_value.fract() == 0.0 {
-                    format!("{float_value:.0}")
-                } else if (float_value * 10.0).fract() == 0.0 {
-                    format!("{float_value:.1}")
-                } else {
-                    format!("{float_value:.2}")
-                }
+                let n_digits = count_digits(*float_value);
+                let acc = rounding_accuracy.min(n_digits);
+                format!("{float_value:.acc$}")
             }
         },
         CalculatorFloat::Str(str_value) => {
@@ -263,11 +259,11 @@ fn format_calculator(calculator: &CalculatorFloat) -> String {
 /// # Returns
 ///
 /// * `String` - The complex's typst representation.
-fn format_complex_value(value: Complex64) -> String {
+fn format_complex_value(value: Complex64, rounding_accuracy: usize) -> String {
     format!(
         "{}+{}i",
-        format_calculator(&CalculatorFloat::Float(value.re)),
-        format_calculator(&CalculatorFloat::Float(value.im))
+        format_calculator(&CalculatorFloat::Float(value.re), rounding_accuracy),
+        format_calculator(&CalculatorFloat::Float(value.im), rounding_accuracy)
     )
 }
 
@@ -300,8 +296,7 @@ fn prepare_for_slice(circuit_gates: &mut Vec<Vec<String>>, circuit_lock: &mut Ve
     } else {
         let last_slice = circuit_gates[0]
             .iter()
-            .filter(|gate| gate.contains("slice") || gate.contains("gategroup"))
-            .next_back();
+            .rfind(|gate| gate.contains("slice") || gate.contains("gategroup"));
         if let Some(last_slice) = last_slice {
             let dist_to_max = circuit_gates
                 .iter()
@@ -417,6 +412,7 @@ pub fn add_gate(
     classical_lock: &mut Vec<(usize, usize)>,
     operation: &Operation,
     render_pragmas: &RenderPragmas,
+    rounding_accuracy: usize,
 ) -> Result<(), RoqoqoBackendError> {
     match render_pragmas {
         RenderPragmas::All => (),
@@ -479,11 +475,11 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ U({}+{}i,{}+{}i,{}) $, label: \"SingleQubitGate\")",
-                format_calculator(&op.alpha_r()),
-                format_calculator(&op.alpha_i()),
-                format_calculator(&op.beta_r()),
-                format_calculator(&op.beta_i()),
-                format_calculator(&op.global_phase())
+                format_calculator(&op.alpha_r(), rounding_accuracy),
+                format_calculator(&op.alpha_i(), rounding_accuracy),
+                format_calculator(&op.beta_r(), rounding_accuracy),
+                format_calculator(&op.beta_i(), rounding_accuracy),
+                format_calculator(&op.global_phase(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -491,7 +487,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Rx\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -499,7 +495,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Ry\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -507,7 +503,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Rz\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -550,7 +546,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"p1\"({}) $, label: \"PhaseShiftState1\")",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -558,7 +554,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"p0\"({}) $, label: \"PhaseShiftState0\")",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -566,9 +562,9 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Rsph\"({},{},{}) $, label: \"RotateAroundSphericalAxis\")",
-                format_calculator(op.theta()),
-                format_calculator(op.spherical_theta()),
-                format_calculator(op.spherical_phi()),
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.spherical_theta(), rounding_accuracy),
+                format_calculator(op.spherical_phi(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -576,8 +572,8 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Rxy\"({},{}) $)",
-                format_calculator(op.theta()),
-                format_calculator(op.phi())
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -597,7 +593,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
                 r#"slice(label: $ "SetStatevector"\ [{}] $, stroke: (paint: black, thickness: 1pt, dash: "solid"))"#,
-                op.statevector().iter().map(|&complex| format_complex_value(complex)).collect::<Vec<String>>().join(","),
+                op.statevector().iter().map(|&complex| format_complex_value(complex, rounding_accuracy)).collect::<Vec<String>>().join(","),
             ));
             Ok(())
         }
@@ -634,8 +630,8 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &qubits);
             circuit_gates[min].push(format!(
                 r#"mqgate($ "Overrotation"\ ({},{})\ "\"{}\"" $, n: {}, width: 10em, fill: gray, inputs: ({}))"#,
-                format_calculator(&CalculatorFloat::Float(*op.amplitude())),
-                format_calculator(&CalculatorFloat::Float(*op.variance())),
+                format_calculator(&CalculatorFloat::Float(*op.amplitude()), rounding_accuracy),
+                format_calculator(&CalculatorFloat::Float(*op.variance()), rounding_accuracy),
                 op.gate_hqslang(),
                 qubits.len(),
                 op.qubits().iter().map(|qubit| format!("(qubit: {})", format_qubit_input(qubit - min, "x"))).collect::<Vec<String>>().join(",")
@@ -649,7 +645,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
                 r#"slice(label: $ "BoostNoise"\ n={} $)"#,
-                format_calculator(op.noise_coefficient()),
+                format_calculator(op.noise_coefficient(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -666,7 +662,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &qubits);
             circuit_gates[min].push(format!(
                 r#"mqgate($ "StopParallelBlock"\ ({}) $, n: {}, width: 13em, fill: gray, inputs: ({}))"#,
-                format_calculator(op.execution_time()),
+                format_calculator(op.execution_time(), rounding_accuracy),
                 qubits.len(),
                 op.qubits().iter().map(|qubit| format!("(qubit: {})", format_qubit_input(qubit - min, "x"))).collect::<Vec<String>>().join(",")
             ));
@@ -718,7 +714,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &(0..n_qubits).collect::<Vec<usize>>());
             circuit_gates[0].push(format!(
                 r#"slice(label: $ "GlobalPhase"\ {} $)"#,
-                format_calculator(op.phase()),
+                format_calculator(op.phase(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -735,7 +731,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &qubits);
             circuit_gates[min].push(format!(
                 r#"mqgate($ "Sleep"({}) $, n: {}, width: 7em, fill: gray, inputs: ({}))"#,
-                format_calculator(op.sleep_time()),
+                format_calculator(op.sleep_time(), rounding_accuracy),
                 qubits.len(),
                 op.qubits()
                     .iter()
@@ -755,8 +751,8 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Damping\"({},{}) $, fill: gray)",
-                format_calculator(op.gate_time()),
-                format_calculator(op.rate()),
+                format_calculator(op.gate_time(), rounding_accuracy),
+                format_calculator(op.rate(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -764,8 +760,8 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Depolarising\"({},{}) $, fill: gray)",
-                format_calculator(op.gate_time()),
-                format_calculator(op.rate()),
+                format_calculator(op.gate_time(), rounding_accuracy),
+                format_calculator(op.rate(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -773,8 +769,8 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"Dephasing\"({},{}) $, fill: gray)",
-                format_calculator(op.gate_time()),
-                format_calculator(op.rate()),
+                format_calculator(op.gate_time(), rounding_accuracy),
+                format_calculator(op.rate(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -782,9 +778,9 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"RandomNoise\"({},{},{}) $, fill: gray)",
-                format_calculator(op.gate_time()),
-                format_calculator(op.depolarising_rate()),
-                format_calculator(op.dephasing_rate()),
+                format_calculator(op.gate_time(), rounding_accuracy),
+                format_calculator(op.depolarising_rate(), rounding_accuracy),
+                format_calculator(op.dephasing_rate(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -792,7 +788,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"GeneralNoise\"({},{}) $, fill: gray)",
-                format_calculator(op.gate_time()),
+                format_calculator(op.gate_time(), rounding_accuracy),
                 op.rates(),
             ));
             Ok(())
@@ -849,6 +845,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -922,7 +919,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"XY\"({})$)",
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -934,7 +931,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PhaseShift\"({}) $)",
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -973,7 +970,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"VariableMSXX\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -985,8 +982,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"GivensRotation\"({},{}) $)",
-                format_calculator(op.theta()),
-                format_calculator(op.phi())
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -998,8 +995,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"GivensRotationLE\"({},{}) $)",
-                format_calculator(op.theta()),
-                format_calculator(op.phi())
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1011,9 +1008,9 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"Qsim\"({},{},{}) $)",
-                format_calculator(op.x()),
-                format_calculator(op.y()),
-                format_calculator(op.z())
+                format_calculator(op.x(), rounding_accuracy),
+                format_calculator(op.y(), rounding_accuracy),
+                format_calculator(op.z(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1025,9 +1022,9 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"Fsim\"({},{},{}) $)",
-                format_calculator(op.t()),
-                format_calculator(op.u()),
-                format_calculator(op.delta()),
+                format_calculator(op.t(), rounding_accuracy),
+                format_calculator(op.u(), rounding_accuracy),
+                format_calculator(op.delta(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1039,9 +1036,9 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"SpinInteraction\"({},{},{}) $)",
-                format_calculator(op.x()),
-                format_calculator(op.y()),
-                format_calculator(op.z())
+                format_calculator(op.x(), rounding_accuracy),
+                format_calculator(op.y(), rounding_accuracy),
+                format_calculator(op.z(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1053,8 +1050,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"Bogoliubov\"({},{}) $)",
-                format_calculator(op.delta_real()),
-                format_calculator(op.delta_imag()),
+                format_calculator(op.delta_real(), rounding_accuracy),
+                format_calculator(op.delta_imag(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1066,7 +1063,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PMInteraction\"({}) $)",
-                format_calculator(op.t()),
+                format_calculator(op.t(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1078,8 +1075,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"ComplexPMInteraction\"({},{}) $)",
-                format_calculator(op.t_real()),
-                format_calculator(op.t_imag()),
+                format_calculator(op.t_real(), rounding_accuracy),
+                format_calculator(op.t_imag(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1091,7 +1088,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PhaseShiftedControlledZ\"({}) $)",
-                format_calculator(op.phi()),
+                format_calculator(op.phi(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1108,7 +1105,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &qubits);
             circuit_gates[min].push(format!(
                 r#"mqgate($ "MultiQubitMS"({}) $, n: {}, width: 11em, inputs: ({}))"#,
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
                 qubits.len(),
                 op.qubits()
                     .iter()
@@ -1134,7 +1131,7 @@ pub fn add_gate(
             flatten_qubits(circuit_gates, &qubits);
             circuit_gates[min].push(format!(
                 r#"mqgate($ "MultiQubitZZ"({}) $, n: {}, width: 11em, inputs: ({}))"#,
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
                 qubits.len(),
                 op.qubits()
                     .iter()
@@ -1285,6 +1282,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -1355,6 +1353,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -1425,6 +1424,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -1504,6 +1504,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -1549,6 +1550,7 @@ pub fn add_gate(
                     classical_lock,
                     &Operation::from(MeasureQubit::new(qubit, "ro".to_owned(), qubit)),
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             flatten_qubits(circuit_gates, &qubit_range_vec(&qubits));
@@ -1561,7 +1563,7 @@ pub fn add_gate(
             circuit_gates[0].push(format!(
                 "slice(label: $ \"Replace Symbole:\"\\ \"{}\"=>{} $)",
                 op.name(),
-                format_calculator(&CalculatorFloat::from(op.input())),
+                format_calculator(&CalculatorFloat::from(op.input()), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1601,7 +1603,7 @@ pub fn add_gate(
                 qubit_range(&qubits),
                 match op.repetitions() {
                     CalculatorFloat::Float(float_value) => (float_value.floor() as usize).to_string(),
-                    _ => format_calculator(op.repetitions()).replace('"', "")
+                    _ => format_calculator(op.repetitions(), rounding_accuracy).replace('"', "")
                 }
             ));
             let group_index = circuit_gates[min].len() - 1;
@@ -1619,6 +1621,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -1639,8 +1642,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PhaseShiftControlledPhase\"({},{})$)",
-                format_calculator(op.theta()),
-                format_calculator(op.phi())
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1652,7 +1655,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"Rx\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1664,8 +1667,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"Rxy\"({},{}) $)",
-                format_calculator(op.theta()),
-                format_calculator(op.phi()),
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1702,7 +1705,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PhaseShift\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1726,7 +1729,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"GPi\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1734,7 +1737,7 @@ pub fn add_gate(
             add_qubits_vec(circuit_gates, &[*op.qubit()]);
             circuit_gates[*op.qubit()].push(format!(
                 "gate($ \"GPi2\"({}) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -1791,6 +1794,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -1808,8 +1812,8 @@ pub fn add_gate(
             prepare_for_bosonic(*op.mode(), bosonic_gates, bosonic_lock);
             bosonic_gates[*op.mode()].push(format!(
                 "gate($ \"Squeezing\"({},{}) $)",
-                format_calculator(op.squeezing()),
-                format_calculator(op.phase()),
+                format_calculator(op.squeezing(), rounding_accuracy),
+                format_calculator(op.phase(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1818,7 +1822,7 @@ pub fn add_gate(
             prepare_for_bosonic(*op.mode(), bosonic_gates, bosonic_lock);
             bosonic_gates[*op.mode()].push(format!(
                 "gate($ \"PhaseShift\"({}) $)",
-                format_calculator(op.phase()),
+                format_calculator(op.phase(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -1833,8 +1837,8 @@ pub fn add_gate(
             flatten_qubits(bosonic_gates, &modes);
             bosonic_gates[min].push(format!(
                 "mqgate($ \"BeamSplitter\"\\ ({},{}) $, n: {}, width: 9em, inputs: ((qubit: {}), (qubit: {})))",
-                format_calculator(op.theta()),
-                format_calculator(op.phi()),
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy),
                 modes.len(),
                 format_qubit_input(*op.mode_0() - min, "x"),
                 format_qubit_input(*op.mode_1() - min, "x")
@@ -1899,6 +1903,7 @@ pub fn add_gate(
                 classical_lock,
                 &op.operation,
                 render_pragmas,
+                rounding_accuracy,
             )?;
             flatten_qubits(circuit_gates, &qubit_range_vec(&qubits));
             Ok(())
@@ -1917,8 +1922,8 @@ pub fn add_gate(
             prepare_for_bosonic(*op.mode(), bosonic_gates, bosonic_lock);
             bosonic_gates[*op.mode()].push(format!(
                 "gate($ \"PhaseDisplacement\"({},{}) $)",
-                format_calculator(op.displacement()),
-                format_calculator(op.phase()),
+                format_calculator(op.displacement(), rounding_accuracy),
+                format_calculator(op.phase(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -2001,6 +2006,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits
@@ -2027,13 +2033,13 @@ pub fn add_gate(
             }
             circuit_gates[*op.qubit()].push(format!(
                 "mqgate($ {} * X $, extent: 1.4em, target: replace_by_n_qubits_plus_{}-{})",
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
                 *op.mode(),
                 *op.qubit(),
             ));
             bosonic_gates[*op.mode()].push(format!(
                 "gate($ {}*(b^(dagger)+b) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -2051,13 +2057,13 @@ pub fn add_gate(
             }
             circuit_gates[*op.qubit()].push(format!(
                 "mqgate($ {} * Z $, extent: 1.4em, target: replace_by_n_qubits_plus_{}-{})",
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
                 *op.mode(),
                 *op.qubit(),
             ));
             bosonic_gates[*op.mode()].push(format!(
                 "gate($ {}*(b^(dagger)+b) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -2075,13 +2081,13 @@ pub fn add_gate(
             }
             circuit_gates[*op.qubit()].push(format!(
                 "mqgate($ {} * (sigma^-+sigma^+) $, extent: 1.4em, target: replace_by_n_qubits_plus_{}-{})",
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
                 *op.mode(),
                 *op.qubit(),
             ));
             bosonic_gates[*op.mode()].push(format!(
                 "gate($ {}*(b^(dagger)+b) $)",
-                format_calculator(op.theta())
+                format_calculator(op.theta(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -2244,7 +2250,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PhaseShiftedControlledControlledZ\"({})$)",
-                format_calculator(op.phi())
+                format_calculator(op.phi(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -2263,8 +2269,8 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"PhaseShiftedControlledControlledPhase\"({},{})$)",
-                format_calculator(op.theta()),
-                format_calculator(op.phi())
+                format_calculator(op.theta(), rounding_accuracy),
+                format_calculator(op.phi(), rounding_accuracy)
             ));
             Ok(())
         }
@@ -2342,7 +2348,7 @@ pub fn add_gate(
             ));
             circuit_gates[*op.target()].push(format!(
                 "gate($ \"TripleControlledPhaseShift\"({})$)",
-                format_calculator(op.theta()),
+                format_calculator(op.theta(), rounding_accuracy),
             ));
             Ok(())
         }
@@ -2392,6 +2398,7 @@ pub fn add_gate(
                     classical_lock,
                     operation,
                     render_pragmas,
+                    rounding_accuracy,
                 )?;
             }
             let max_gates_len_diff = qubits

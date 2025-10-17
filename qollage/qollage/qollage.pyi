@@ -32,6 +32,7 @@ def draw_circuit(
     render_pragmas: str = "all",
     initialization_mode: Optional[str] = None,
     max_circuit_length: Optional[int] = None,
+    rounding_accuracy: Optional[int] = None,
 ) -> None:
     """
     Displays the qoqo circuit as an image output
@@ -49,6 +50,8 @@ def draw_circuit(
              - "qubit" for "q[n]".\n
          * max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
              The default setting `None` does not create a new line.
+         * rounding_accuracy (Optional(int)): The number of decimals displayed for floats.
+             If None, the default rounding accuracy of roqollage (3) is used.
 
     ## Raises:
          * TypeError: Circuit conversion error.
@@ -62,6 +65,7 @@ def save_circuit(
     render_pragmas: str = "all",
     initialization_mode: Optional[str] = None,
     max_circuit_length: Optional[int] = None,
+    rounding_accuracy: Optional[int] = None,
 ) -> None:
     """
     Saves the qoqo circuit as a png image
@@ -80,6 +84,8 @@ def save_circuit(
              - "qubit" for "q[n]".\n
          * max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
              The default setting `None` does not create a new line.
+         * rounding_accuracy (Optional(int)): The number of decimals displayed for floats.
+             If None, the default rounding accuracy of roqollage (3) is used.
 
     ## Raises:
          * TypeError: Circuit conversion error
@@ -91,6 +97,7 @@ def circuit_to_typst_str(
     render_pragmas: str = "all",
     initialization_mode: Optional[str] = None,
     max_circuit_length: Optional[int] = None,
+    rounding_accuracy: Optional[int] = None,
 ) -> str:
     """
     Returns the circuit's representation in Typst.
@@ -108,6 +115,8 @@ def circuit_to_typst_str(
              - "qubit" for "q[n]".\n
          * max_circuit_length (Optional(int)): The maximum number of gates per qubit before going to a new line.
              The default setting `None` does not create a new line.
+         * rounding_accuracy (Optional(int)): The number of decimals displayed for floats.
+             If None, the default rounding accuracy of roqollage (3) is used.
 
     ## Returns:
          * str: The circuit's representation in Typst.

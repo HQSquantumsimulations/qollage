@@ -4,6 +4,11 @@ This changelog track changes to the qollage project starting at version v0.1.0
 
 ## Unpublished
 
+## 0.9.1
+
+* Fixed a bug that would cause an infinite loop when using a large `max_circuit_len`.
+* Improved the visuals for multi-page circuits.
+
 ## 0.9.0
 
 * Added a new optional parameter: `rounding_accuracy` to allow the user to choose the number of

@@ -482,7 +482,7 @@ fn split_in_chunk_preprocess(
     max_len: usize,
     new_len_map: &mut HashMap<i64, usize>,
 ) -> bool {
-    if !gates_vec.is_empty() && gates_vec[0].len() > max_len {
+    if !gates_vec.is_empty() && effective_len(gates_vec[0].as_slice()) > max_len {
         let ref_map = new_len_map.clone();
         for inner_vec in gates_vec.iter() {
             let mut ind_chunk = 0_usize;
@@ -534,7 +534,7 @@ fn split_in_chunk_preprocess(
         }
         return ref_map.eq(new_len_map);
     }
-    false
+    true
 }
 
 /// Converts a qoqo circuit to a typst string.
@@ -619,11 +619,11 @@ pub fn circuit_into_typst_str(
             split_gates(&mut classical_gates, max_circuit_length, &new_len_map);
     }
     let mut is_first = true;
-    for (n_qubit, gates) in circuit_gates.iter().enumerate() {
+    for (qubit_index, gates) in circuit_gates.iter().enumerate() {
         typst_str.push_str(&format!(
-            "       lstick(${}${}), {} 1, [\\ ],\n",
+            "       lstick(${}${}), {} 1, {}[\\ ],\n",
             match initialization_mode {
-                Some(InitializationMode::Qubit) => format!("q[{n_qubit}]"),
+                Some(InitializationMode::Qubit) => format!("q[{qubit_index}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
             },
             if is_first {
@@ -644,14 +644,19 @@ pub fn circuit_into_typst_str(
                 })
                 .chain(vec!["".to_owned()].into_iter())
                 .collect::<Vec<String>>()
-                .join(", ")
+                .join(", "),
+            if additional_circuit_gates.is_some() {
+                "rstick($···$),"
+            } else {
+                Default::default()
+            }
         ));
         is_first = false;
     }
     is_first = true;
     for (n_boson, gates) in bosonic_gates.iter().enumerate() {
         typst_str.push_str(&format!(
-            "       lstick(${}${}), {}, 1, [\\ ],\n",
+            "       lstick(${}${}), {}, 1, {}[\\ ],\n",
             match initialization_mode {
                 Some(InitializationMode::Qubit) => format!("q[{n_boson}]"),
                 Some(InitializationMode::State) | None => "|0>".to_owned(),
@@ -661,7 +666,12 @@ pub fn circuit_into_typst_str(
             } else {
                 Default::default()
             },
-            gates.join(", ")
+            gates.join(", "),
+            if additional_bosonic_gates.is_some() {
+                "rstick($···$),"
+            } else {
+                Default::default()
+            }
         ));
         is_first = false;
     }
@@ -690,20 +700,10 @@ pub fn circuit_into_typst_str(
         for chunk_number in 0..number_of_chunks {
             if let Some(ref add_circuit_gates) = additional_circuit_gates {
                 let current_chunk = &add_circuit_gates[chunk_number];
-                is_first = true;
-                for gates in current_chunk.iter() {
+                for (qubit_index, gates) in current_chunk.iter().enumerate() {
                     typst_str.push_str(&format!(
-                        "{}       lstick($${}), {}, 1, [\\ ],\n",
-                        if is_first {
-                            "[\\ ],\n"
-                        } else {
-                            Default::default()
-                        },
-                        if is_first {
-                            ", label: \"Qubits\""
-                        } else {
-                            Default::default()
-                        },
+                        "lstick($···q[{}]$), {}, 1, {}[\\ ],\n",
+                        qubit_index,
                         gates
                             .iter()
                             .map(|gate| {
@@ -716,45 +716,35 @@ pub fn circuit_into_typst_str(
                                 }
                             })
                             .collect::<Vec<String>>()
-                            .join(", ")
+                            .join(", "),
+                        if chunk_number != number_of_chunks - 1 {
+                            "rstick($···$),"
+                        } else {
+                            Default::default()
+                        }
                     ));
-                    is_first = false;
                 }
             }
             if let Some(ref add_bosonic_gates) = additional_bosonic_gates {
                 let current_chunk = &add_bosonic_gates[chunk_number];
-                is_first = true;
-                for gates in current_chunk.iter() {
+                for (qubit_index, gates) in current_chunk.iter().enumerate() {
                     typst_str.push_str(&format!(
-                        "{}       lstick($${}), {}, 1, [\\ ],\n",
-                        if is_first {
-                            "[\\ ],\n"
+                        "lstick($···b[{}]$), {}, 1, {}[\\ ],\n",
+                        qubit_index,
+                        gates.join(", "),
+                        if chunk_number != number_of_chunks - 1 {
+                            "rstick($···$),"
                         } else {
                             Default::default()
-                        },
-                        if is_first {
-                            ", label: \"Bosons\""
-                        } else {
-                            Default::default()
-                        },
-                        gates.join(", ")
+                        }
                     ));
-                    is_first = false;
                 }
             }
             if let Some(ref add_classical_gates) = additional_classical_gates {
                 let current_chunk = &add_classical_gates[chunk_number];
                 for (index, gates) in current_chunk.clone().iter_mut().enumerate() {
                     gates.insert(0, classical_gates[index][1].clone());
-                    typst_str.push_str(&format!(
-                        "{}       lstick($$), {}, 1, [\\ ],\n",
-                        if is_first {
-                            "[\\ ],\n"
-                        } else {
-                            Default::default()
-                        },
-                        gates.join(", "),
-                    ));
+                    typst_str.push_str(&format!("{}, 1, [\\ ],\n", gates.join(", "),));
                 }
             }
         }

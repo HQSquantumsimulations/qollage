@@ -46,6 +46,8 @@ ignore = [
     "RUSTSEC-2025-0141", # TODO: Remove when switching to a new serialisation format.
     "RUSTSEC-2026-0192", # ttf parser no longer maintained.
     "RUSTSEC-2026-0206", # rustybuzz no longer maintained.
+    "RUSTSEC-2026-0194", # quick-xml vulnerability in NsReader. 
+    "RUSTSEC-2026-0195", # quick-xml vulnerability in NsReader. 
     #"RUSTSEC-0000-0000",
 ]
 # Threshold for security vulnerabilities, any vulnerability with a CVSS score
@@ -82,7 +84,8 @@ allow = [
     "ISC",
     "Zlib",
     "NCSA",
-    "CDLA-Permissive-2.0"
+    "CDLA-Permissive-2.0",
+    "0BSD"
 ]
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the

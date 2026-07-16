@@ -145,7 +145,7 @@ pub fn draw_circuit(
             ))
         })?;
 
-    Python::with_gil(|py| {
+    Python::attach(|py| {
         let pil = PyModule::import(py, "PIL.Image").unwrap();
         let io = PyModule::import(py, "io").unwrap();
         let display = PyModule::import(py, "IPython.display").unwrap();

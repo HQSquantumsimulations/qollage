@@ -25,7 +25,7 @@ use roqoqo::{operations::*, Circuit};
 fn circuitpy_from_circuitru(py: Python, circuit: Circuit) -> Bound<CircuitWrapper> {
     let circuit_type = py.get_type::<CircuitWrapper>();
     let binding = circuit_type.call0().unwrap();
-    let circuitpy = binding.downcast::<CircuitWrapper>().unwrap();
+    let circuitpy = binding.cast::<CircuitWrapper>().unwrap();
     for op in circuit {
         let new_op = convert_operation_to_pyobject(op, py).unwrap();
         circuitpy.call_method1("add", (new_op.clone(),)).unwrap();
@@ -55,8 +55,8 @@ fn test_file() {
     circuit.add_operation(SWAP::new(2, 1));
     circuit.add_operation(Toffoli::new(0, 1, 4));
 
-    pyo3::prepare_freethreaded_python();
-    Python::with_gil(|py| {
+    Python::initialize();
+    Python::attach(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
         assert!(save_circuit(
             &circuitpy,
@@ -145,8 +145,8 @@ fn test_file_error() {
     circuit.add_operation(Toffoli::new(0, 1, 4));
     circuit.add_operation(PragmaStopParallelBlock::new(vec![], CalculatorFloat::ONE));
 
-    pyo3::prepare_freethreaded_python();
-    Python::with_gil(|py| {
+    Python::initialize();
+    Python::attach(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
         let calc = Py::new(
             py,
@@ -202,8 +202,8 @@ fn test_str() {
     circuit.add_operation(SWAP::new(2, 1));
     circuit.add_operation(Toffoli::new(0, 1, 4));
 
-    pyo3::prepare_freethreaded_python();
-    Python::with_gil(|py| {
+    Python::initialize();
+    Python::attach(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
 
         assert!(circuit_to_typst_str(&circuitpy, "", None, None, None).is_ok());
@@ -236,8 +236,8 @@ fn test_str_error() {
     circuit.add_operation(Toffoli::new(0, 1, 4));
     circuit.add_operation(PragmaStopParallelBlock::new(vec![], CalculatorFloat::ONE));
 
-    pyo3::prepare_freethreaded_python();
-    Python::with_gil(|py| {
+    Python::initialize();
+    Python::attach(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
         let calc = Py::new(
             py,
@@ -284,8 +284,8 @@ fn test_draw() {
     circuit.add_operation(SWAP::new(2, 1));
     circuit.add_operation(Toffoli::new(0, 1, 4));
 
-    pyo3::prepare_freethreaded_python();
-    Python::with_gil(|py| {
+    Python::initialize();
+    Python::attach(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
 
         assert!(draw_circuit(&circuitpy, 0.5, "none", None, None, None).is_ok());
@@ -329,8 +329,8 @@ fn test_draw_error() {
         0.2,
     ));
 
-    pyo3::prepare_freethreaded_python();
-    Python::with_gil(|py| {
+    Python::initialize();
+    Python::attach(|py| {
         let circuitpy = circuitpy_from_circuitru(py, circuit);
         let calc = Py::new(
             py,

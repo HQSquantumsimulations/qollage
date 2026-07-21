@@ -12,7 +12,7 @@
 
 use std::{
     collections::HashMap,
-    io::{Cursor, Write},
+    io::{Cursor},
     path::PathBuf,
     str::FromStr,
     sync::RwLock,
@@ -76,6 +76,8 @@ pub enum RenderPragmas {
     Partial(Vec<String>),
 }
 
+const FIRA_MATH_FONT: &[u8] = include_bytes!("../assets/FiraMath.otf");
+
 impl TypstBackend {
     /// Creates a new TypstBackend.
     ///
@@ -83,15 +85,7 @@ impl TypstBackend {
     ///
     /// * `typst_str` - The typst source file.
     pub fn new(typst_str: String) -> Result<Self, RoqoqoBackendError> {
-        let path = PathBuf::from(".qollage/fonts/FiraMath.otf");
-        let bytes = match std::fs::read(path.clone()) {
-            Ok(bytes) => bytes,
-            Err(_) => {
-                Self::download_font(path).map_err(|err| RoqoqoBackendError::NetworkError {
-                    msg: format!("Couldn't download the font: {err}"),
-                })?
-            }
-        };
+        let bytes = FIRA_MATH_FONT.to_vec();
         let buffer = Bytes::new(bytes);
         let fonts = Font::new(buffer.clone(), 0).map_or_else(std::vec::Vec::new, |font| vec![font]);
         let library = Library::builder().build();
@@ -107,45 +101,6 @@ impl TypstBackend {
                     msg: "Couldn't access `.qollage/cache` directory".to_owned(),
                 })
             })?,
-        })
-    }
-
-    /// Downloads the FiraMath font.
-    ///
-    /// # Arguments
-    ///
-    /// * `path` `The path where to save the downloaded font file
-    fn download_font(path: PathBuf) -> Result<Vec<u8>, RoqoqoBackendError> {
-        std::fs::create_dir_all(
-            path.parent()
-                .unwrap_or(PathBuf::from(".qollage/fonts/").as_path()),
-        )
-        .map_err(|err| RoqoqoBackendError::GenericError {
-            msg: format!("Couldn't create the font directory: {err}."),
-        })?;
-        let url = "https://mirrors.ctan.org/fonts/firamath/FiraMath-Regular.otf";
-
-        let response = ureq::get(url)
-            .call()
-            .map_err(|err| RoqoqoBackendError::NetworkError {
-                msg: format!("Couldn't download the font file: {err}."),
-            })?;
-        let data =
-            response
-                .into_body()
-                .read_to_vec()
-                .map_err(|err| RoqoqoBackendError::NetworkError {
-                    msg: format!("Couldn't read the font file: {err}."),
-                })?;
-        let mut file =
-            std::fs::File::create(&path).map_err(|err| RoqoqoBackendError::GenericError {
-                msg: format!("Couldn't create the font file: {err}."),
-            })?;
-        std::fs::File::write(&mut file, &data).map_err(|err| RoqoqoBackendError::GenericError {
-            msg: format!("Couldn't write the font file: {err}."),
-        })?;
-        std::fs::read(path).map_err(|err| RoqoqoBackendError::GenericError {
-            msg: format!("Couldn't read the font file: {err}"),
         })
     }
 

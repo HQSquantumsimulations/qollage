@@ -7,6 +7,7 @@ This changelog track changes to the qollage project starting at version v0.1.0
 ## 0.10.0
 
 * Update to the latest dependencies. 
+* Include the font directly into the source code and wheel.
 
 ## 0.9.1
 

@@ -10,13 +10,7 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{
-    collections::HashMap,
-    io::{Cursor},
-    path::PathBuf,
-    str::FromStr,
-    sync::RwLock,
-};
+use std::{collections::HashMap, io::Cursor, path::PathBuf, str::FromStr, sync::RwLock};
 
 use image::DynamicImage;
 use roqoqo::{Circuit, RoqoqoBackendError, RoqoqoError};

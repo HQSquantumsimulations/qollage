@@ -4,6 +4,10 @@ This changelog track changes to the qollage project starting at version v0.1.0
 
 ## Unpublished
 
+## 0.10.1
+
+* Include assets files for the release.
+
 ## 0.10.0
 
 * Update to the latest dependencies. 

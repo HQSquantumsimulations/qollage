@@ -1,6 +1,6 @@
 [package]
 name = "roqollage"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -9,7 +9,7 @@ categories = ["science", "simulation"]
 readme = "README.md"
 repository = "https://github.com/HQSquantumsimulations/qollage"
 description = "Visualization tool for roqoqo Rust quantum computing toolkit by HQS Quantum Simulations"
-include = ["src*", "LICENSE", "README.md"]
+include = ["src*", "LICENSE", "README.md", "assets*"]
 
 [lib]
 name = "roqollage"
